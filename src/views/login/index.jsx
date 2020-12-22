@@ -1,131 +1,280 @@
-import React, { useState } from "react";
-import { Redirect } from "react-router-dom";
-import { Form, Icon, Input, Button, message, Spin } from "antd";
-import { connect } from "react-redux";
-import DocumentTitle from "react-document-title";
-import "./index.less";
-import { login, getUserInfo } from "@/store/actions";
+import React, { useState } from 'react'
+import { Redirect } from 'react-router-dom'
+import { Form, Icon, Input, Button, message, Spin, Tabs, Select } from 'antd'
+import { connect } from 'react-redux'
+import DocumentTitle from 'react-document-title'
+import axios from '../../request/axiosConfig'
+import api from '../../request/api/api_user'
+import Cookie from 'js-cookie'
+import { browserHistory } from 'react-router'
+import './index.less'
+
+const { TabPane } = Tabs
 
 const Login = (props) => {
-  const { form, token, login, getUserInfo } = props;
-  const { getFieldDecorator } = form;
+  const { form, token, login, getUserInfo } = props
+  const { getFieldDecorator } = form
 
-  const [loading, setLoading] = useState(false);
-
-  const handleLogin = (username, password) => {
-    // 登录完成后 发送请求 调用接口获取用户信息
-    setLoading(true);
-    login(username, password)
-      .then((data) => {
-        message.success("登录成功");
-        handleUserInfo(data.token);
-      })
-      .catch((error) => {
-        setLoading(false);
-        message.error(error);
-      });
-  };
-
-  // 获取用户信息
-  const handleUserInfo = (token) => {
-    getUserInfo(token)
-      .then((data) => {})
-      .catch((error) => {
-        message.error(error);
-      });
-  };
+  const [loading, setLoading] = useState(false)
+  const [key, setKey] = useState('1')
 
   const handleSubmit = (event) => {
     // 阻止事件的默认行为
-    event.preventDefault();
+    event.preventDefault()
 
     // 对所有表单字段进行检验
-    form.validateFields((err, values) => {
+    form.validateFields(async (err, values) => {
+      console.log('err', err, 'values', values, key)
       // 检验成功
       if (!err) {
-        const { username, password } = values;
-        handleLogin(username, password);
-      } else {
-        console.log("检验失败!");
+        if (key === '1') {
+          console.log(111)
+          const res = await axios({
+            url: 'http://localhost:8088/interface/User/userLogin',
+            method: 'post',
+            data: values,
+          })
+          console.log('res', res)
+          const { userInfo } = res
+          Cookie.set('userInfo', userInfo, {
+            expires: new Date(new Date().getTime() + 1 * 60 * 60 * 1000),
+          })
+          message.success('登录成功！')
+         window.location.href = '/dashboard'
+          console.log('cookie',Cookie.get('userInfo'))
+        } else {
+          const res = await axios({
+            url: api.registerUser,
+            method: 'post',
+            data: values,
+          })
+          console.log('res', res)
+        }
       }
-    });
-  };
+    })
+  }
 
   if (token) {
-    return <Redirect to="/dashboard" />;
+    return <Redirect to='/dashboard' />
   }
   return (
-    <DocumentTitle title={"用户登录"}>
-      <div className="login-container">
-        <Form onSubmit={handleSubmit} className="content">
-          <div className="title">
-            <h2>用户登录</h2>
-          </div>
-          <Spin spinning={loading} tip="登录中...">
-            <Form.Item>
-              {getFieldDecorator("username", {
-                rules: [
-                  {
-                    required: true,
-                    whitespace: true,
-                    message: "请输入用户名",
-                  },
-                ],
-                initialValue: "admin", // 初始值
-              })(
-                <Input
-                  prefix={
-                    <Icon type="user" style={{ color: "rgba(0,0,0,.25)" }} />
-                  }
-                  placeholder="用户名"
-                />
-              )}
-            </Form.Item>
-            <Form.Item>
-              {getFieldDecorator("password", {
-                rules: [
-                  {
-                    required: true,
-                    whitespace: true,
-                    message: "请输入密码",
-                  },
-                ],
-                initialValue: "123456", // 初始值
-              })(
-                <Input
-                  prefix={
-                    <Icon type="lock" style={{ color: "rgba(0,0,0,.25)" }} />
-                  }
-                  type="password"
-                  placeholder="密码"
-                />
-              )}
-            </Form.Item>
-            <Form.Item>
-              <Button
-                type="primary"
-                htmlType="submit"
-                className="login-form-button"
-              >
-                登录
-              </Button>
-            </Form.Item>
-            <Form.Item>
-              <span>账号 : admin 密码 : 随便填</span>
-              <br />
-              <span>账号 : editor 密码 : 随便填</span>
-              <br />
-              <span>账号 : guest 密码 : 随便填</span>
-            </Form.Item>
+    <DocumentTitle title={'导员登录'}>
+      <div className='login-container'>
+        <div className='content'>
+          <Spin spinning={loading} tip='登录中...'>
+            <Tabs
+              activeKey={key}
+              defaultActiveKey='1'
+              onChange={(e) => setKey(e)}
+            >
+              <TabPane tab='导员登录' key='1'>
+                <Form onSubmit={handleSubmit}>
+                  <Form.Item>
+                    {getFieldDecorator('userName', {
+                      rules: [
+                        {
+                          required: true,
+                          whitespace: true,
+                          message: '请输入用户名',
+                        },
+                      ],
+                      initialValue: 'admin', // 初始值
+                    })(
+                      <Input
+                        prefix={
+                          <Icon
+                            type='user'
+                            style={{ color: 'rgba(0,0,0,.25)' }}
+                          />
+                        }
+                        placeholder='用户名'
+                      />
+                    )}
+                  </Form.Item>
+                  <Form.Item>
+                    {getFieldDecorator('passWord', {
+                      rules: [
+                        {
+                          required: true,
+                          whitespace: true,
+                          message: '请输入密码',
+                        },
+                      ],
+                      initialValue: '123456', // 初始值
+                    })(
+                      <Input
+                        prefix={
+                          <Icon
+                            type='lock'
+                            style={{ color: 'rgba(0,0,0,.25)' }}
+                          />
+                        }
+                        type='password'
+                        placeholder='密码'
+                      />
+                    )}
+                  </Form.Item>
+                  <Form.Item>
+                    <Button
+                      type='primary'
+                      onClick={handleSubmit}
+                      className='login-form-button'
+                    >
+                      登录
+                    </Button>
+                  </Form.Item>
+                </Form>
+              </TabPane>
+              {/* 注册模块 */}
+              <TabPane tab='导员注册' key='2'>
+                <Form onSubmit={handleSubmit}>
+                  <Form.Item>
+                    {getFieldDecorator('userName', {
+                      rules: [
+                        {
+                          required: key === '2',
+                          whitespace: true,
+                          message: '请输入用户名',
+                        },
+                      ],
+                    })(
+                      <Input
+                        prefix={
+                          <Icon
+                            type='user'
+                            style={{ color: 'rgba(0,0,0,.25)' }}
+                          />
+                        }
+                        placeholder='用户名'
+                      />
+                    )}
+                  </Form.Item>
+                  <Form.Item>
+                    {getFieldDecorator('reallyName', {
+                      rules: [
+                        {
+                          required: key === '2',
+                          whitespace: true,
+                          message: '请输入真实姓名',
+                        },
+                      ],
+                    })(
+                      <Input
+                        prefix={
+                          <Icon
+                            type='user'
+                            style={{ color: 'rgba(0,0,0,.25)' }}
+                          />
+                        }
+                        placeholder='真实姓名'
+                      />
+                    )}
+                  </Form.Item>
+                  <Form.Item>
+                    {getFieldDecorator('regPassWord', {
+                      rules: [
+                        {
+                          required: key === '2',
+                          whitespace: true,
+                          message: '请输入密码',
+                        },
+                      ],
+                    })(
+                      <Input
+                        prefix={
+                          <Icon
+                            type='lock'
+                            style={{ color: 'rgba(0,0,0,.25)' }}
+                          />
+                        }
+                        type='password'
+                        placeholder='密码'
+                      />
+                    )}
+                  </Form.Item>
+                  <Form.Item>
+                    {getFieldDecorator('phone', {
+                      rules: [
+                        {
+                          required: key === '2',
+                          message: '请输入手机号',
+                        },
+                      ],
+                    })(
+                      <Input
+                        prefix={
+                          <Icon
+                            type='lock'
+                            style={{ color: 'rgba(0,0,0,.25)' }}
+                          />
+                        }
+                        type='phone'
+                        placeholder='手机号'
+                      />
+                    )}
+                  </Form.Item>
+                  <Form.Item>
+                    {getFieldDecorator('regEmail', {
+                      rules: [
+                        {
+                          required: key === '2',
+                          message: '请输入邮箱',
+                        },
+                      ],
+                    })(
+                      <Input
+                        prefix={
+                          <Icon
+                            type='lock'
+                            style={{ color: 'rgba(0,0,0,.25)' }}
+                          />
+                        }
+                        type='password'
+                        placeholder='邮箱'
+                      />
+                    )}
+                  </Form.Item>
+                  <Form.Item>
+                    {getFieldDecorator('passWord', {
+                      rules: [
+                        {
+                          required: key === '2',
+                          whitespace: true,
+                          message: '请输入年级',
+                        },
+                      ],
+                    })(
+                      <Input
+                        prefix={
+                          <Icon
+                            type='lock'
+                            style={{ color: 'rgba(0,0,0,.25)' }}
+                          />
+                        }
+                        type='garde'
+                        placeholder='年级'
+                      />
+                    )}
+                  </Form.Item>
+                  <Form.Item>
+                    <Button
+                      type='primary'
+                      htmlType='submit'
+                      className='login-form-button'
+                    >
+                      注册
+                    </Button>
+                  </Form.Item>
+                </Form>
+              </TabPane>
+            </Tabs>
           </Spin>
-        </Form>
+        </div>
       </div>
     </DocumentTitle>
-  );
-};
+  )
+}
 
-const WrapLogin = Form.create()(Login);
+const WrapLogin = Form.create()(Login)
 
-export default connect((state) => state.user, { login, getUserInfo })(
-  WrapLogin
-);
+export default WrapLogin

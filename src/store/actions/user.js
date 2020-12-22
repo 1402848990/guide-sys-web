@@ -1,23 +1,20 @@
 import * as types from "../action-types";
-import { reqUserInfo } from "@/api/user";
+import Cookie from 'js-cookie'
 
 export const getUserInfo = (token) => (dispatch) => {
+  console.log(11)
   return new Promise((resolve, reject) => {
-    reqUserInfo(token)
-      .then((response) => {
-        const { data } = response;
-        if (data.status === 0) {
-          const userInfo = data.userInfo;
-          dispatch(setUserInfo(userInfo));
-          resolve(data);
-        } else {
-          const msg = data.message;
-          reject(msg);
-        }
-      })
-      .catch((error) => {
-        reject(error);
-      });
+
+    const userInfo =  Cookie.get('userInfo')
+    const user = JSON.parse(userInfo)
+    user.id = user.userName
+    user.name = user.reallyName
+    user.role = 'admin'
+    user.avatar = "https://s1.ax1x.com/2020/04/28/J5hUaT.jpg"
+    console.log('user',user)
+          dispatch(setUserInfo(user));
+          resolve(userInfo);
+  
   });
 };
 
@@ -29,6 +26,7 @@ export const setUserToken = (token) => {
 };
 
 export const setUserInfo = (userInfo) => {
+  console.log('userInfo',userInfo)
   return {
     type: types.USER_SET_USER_INFO,
     ...userInfo,

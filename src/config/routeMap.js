@@ -1,6 +1,7 @@
 import Loadable from 'react-loadable';
 import Loading from '@/components/Loading'
 const Dashboard = Loadable({loader: () => import(/*webpackChunkName:'Dashboard'*/'@/views/dashboard'),loading: Loading});
+const UserInfo = Loadable({loader: () => import(/*webpackChunkName:'UserInfo'*/'@/views/userInfo'),loading: Loading});
 const Doc = Loadable({loader: () => import(/*webpackChunkName:'Doc'*/'@/views/doc'),loading: Loading});
 const Guide = Loadable({loader: () => import(/*webpackChunkName:'Guide'*/'@/views/guide'),loading: Loading});
 const Explanation = Loadable({loader: () => import(/*webpackChunkName:'Explanation'*/'@/views/permission'),loading: Loading});
@@ -27,6 +28,7 @@ const Bug = Loadable({loader: () => import(/*webpackChunkName:'Bug'*/'@/views/bu
 
 export default [
   { path: "/dashboard", component: Dashboard, roles: ["admin","editor","guest"] },
+  { path: "/userInfo", component: UserInfo, roles: ["admin","editor","guest"] },
   { path: "/doc", component: Doc, roles: ["admin","editor","guest"] },
   { path: "/guide", component: Guide, roles: ["admin","editor"] },
   { path: "/permission/explanation", component: Explanation, roles: ["admin"] },

@@ -36,6 +36,7 @@ class TransactionTable extends Component {
   };
   fetchData = () => {
     transactionList().then((response) => {
+      console.log('---------response',response)
       const list = response.data.data.items.slice(0, 13);
       if (this._isMounted) { 
         this.setState({ list });
@@ -44,7 +45,7 @@ class TransactionTable extends Component {
   };
   componentDidMount() {
     this._isMounted = true;
-    this.fetchData();
+    // this.fetchData();
   }
   componentWillUnmount() {
     this._isMounted = false;

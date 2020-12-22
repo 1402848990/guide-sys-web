@@ -1,12 +1,12 @@
 import React from "react";
 import { HashRouter, Route, Switch, Redirect } from "react-router-dom";
-import { connect } from "react-redux";
-import { getUserInfo } from "@/store/actions";
 import Layout from "@/views/layout";
 import Login from "@/views/login";
+import Cookie from 'js-cookie'
 class Router extends React.Component {
   render() {
-    const { token, role, getUserInfo } = this.props;
+    const userInfo = Cookie.get('userInfo')
+    console.log('router-userInfo',userInfo)
     return (
       <HashRouter>
         <Switch>
@@ -14,14 +14,10 @@ class Router extends React.Component {
           <Route
             path="/"
             render={() => {
-              if (!token) {
+              if (!userInfo) {
                 return <Redirect to="/login" />;
               } else {
-                if (role) {
-                  return <Layout />;
-                } else {
-                  getUserInfo(token).then(() => <Layout />);
-                }
+                 return <Layout />;
               }
             }}
           />
@@ -31,4 +27,4 @@ class Router extends React.Component {
   }
 }
 
-export default connect((state) => state.user, { getUserInfo })(Router);
+export default Router

@@ -8,7 +8,7 @@ const users = {
   "admin-token": {
     id: "admin",
     role: "admin",
-    name: "难凉热血",
+    name: "难凉热血2",
     avatar: "https://s1.ax1x.com/2020/04/28/J5hUaT.jpg",
     description: "拥有系统内所有菜单和路由权限",
   },
@@ -29,20 +29,20 @@ const users = {
 };
 
 export default {
-  login: (config) => {
-    const { username } = JSON.parse(config.body);
-    const token = tokens[username];
-    if (!token) {
-      return {
-        status: 1,
-        message: "用户名或密码错误",
-      };
-    }
-    return {
-      status: 0,
-      token,
-    };
-  },
+  // login: (config) => {
+  //   const { username } = JSON.parse(config.body);
+  //   const token = tokens[username];
+  //   if (!token) {
+  //     return {
+  //       status: 1,
+  //       message: "用户名或密码错误",
+  //     };
+  //   }
+  //   return {
+  //     status: 0,
+  //     token,
+  //   };
+  // },
   userInfo: (config) => {
     const token = config.body;
     const userInfo = users[token];

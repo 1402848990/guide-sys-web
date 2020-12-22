@@ -20,4 +20,4 @@ const Main = (props) => {
     </Layout>
   );
 };
-export default connect((state) => state.settings)(Main);
+export default Main;
