@@ -67,3 +67,38 @@ export function timestampToTime(timestamp) {
   let strDate = Y+M+D+h+m+s;
   return strDate;
 }
+
+export const DATE = [
+  {
+    label:'大一上学期',
+    value:'大一上学期'
+  },
+  {
+    label:'大一下学期',
+    value:'大一下学期'
+  },
+  {
+    label:'大二上学期',
+    value:'大二上学期'
+  },
+  {
+    label:'大二下学期',
+    value:'大二下学期'
+  },
+  {
+    label:'大三上学期',
+    value:'大三上学期'
+  },
+  {
+    label:'大三下学期',
+    value:'大三下学期'
+  },
+  {
+    label:'大四上学期',
+    value:'大四上学期'
+  },
+  {
+    label:'大四下学期',
+    value:'大四下学期'
+  }
+]

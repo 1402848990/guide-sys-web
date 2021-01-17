@@ -1,7 +1,6 @@
 import React from 'react'
 import { Redirect, withRouter, Route, Switch } from 'react-router-dom'
 import DocumentTitle from 'react-document-title'
-import { connect } from 'react-redux'
 import { CSSTransition, TransitionGroup } from 'react-transition-group'
 import { Layout } from 'antd'
 import { getMenuItemInMenuListByProperty } from '@/utils'
@@ -13,7 +12,7 @@ const getPageTitle = (menuList, pathname) => {
   let title = 'Ant Design Pro'
   let item = getMenuItemInMenuListByProperty(menuList, 'path', pathname)
   if (item) {
-    title = `${item.title} - Ant Design Pro`
+    title = `${item.title}`
   }
   return title
 }

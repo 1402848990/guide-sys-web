@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { Row, Col } from "antd";
 import "./index.less";
 import PanelGroup from "./components/PanelGroup";
@@ -8,6 +8,9 @@ import RaddarChart from "./components/RaddarChart";
 import PieChart from "./components/PieChart";
 import TransactionTable from "./components/TransactionTable";
 import BoxCard from "./components/BoxCard";
+import axios from '../../request/axiosConfig'
+
+const HOST = 'http://localhost:8088/interface'
 
 const lineChartDefaultData = {
   "New Visits": {
@@ -32,19 +35,34 @@ const Dashboard = () => {
   const [lineChartData, setLineChartData] = useState(
     lineChartDefaultData["New Visits"]
   );
+  const [stuList,setStuList] = useState([])
+  const [noteList,setNoteList] = useState([])
+  const [planList,setPlanList] = useState([])
+  const [contactList,setContactList] = useState([])
+
+
+    // 获取数据
+    const getData = async () => {
+      const {data:sList} = await axios.post(`${HOST}/Stu/list`)
+      const {data:nList} = await axios.post(`${HOST}/User/noteList`)
+      const {data:pList} = await axios.post(`${HOST}/User/planList`)
+      const {data:cList} = await axios.post(`${HOST}/User/contactList`)
+      setStuList(sList)
+      setNoteList(nList)
+      setPlanList(pList)
+      setContactList(cList)
+    }
+
+  useEffect(() => {
+    getData()
+  }, [])
 
   const handleSetLineChartData = (type) => setLineChartData(lineChartDefaultData[type]);
 
   return (
     <div className="app-container">
-      <a
-        href="https://github.com/NLRX-WJC/react-antd-admin-template"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="github-corner"
-      ></a>
 
-      <PanelGroup handleSetLineChartData={handleSetLineChartData} />
+      <PanelGroup stuList={stuList} noteList={noteList} planList={planList} contactList={contactList} handleSetLineChartData={handleSetLineChartData} />
 
       <LineChart
         chartData={lineChartData}

@@ -5,6 +5,7 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
+    "@ant-design/charts": "^1.0.13",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.5.0",
     "@testing-library/user-event": "^7.2.1",
@@ -22,6 +23,7 @@
     "jszip": "^3.4.0",
     "less": "^3.9.0",
     "less-loader": "^5.0.0",
+    "lodash": "^4.17.20",
     "nprogress": "^0.2.0",
     "prop-types": "^15.7.2",
     "react": "^16.13.1",

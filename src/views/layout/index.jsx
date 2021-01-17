@@ -1,21 +1,18 @@
 import React from "react";
-import { connect } from "react-redux";
 import Content from "./Content";
 import Header from "./Header";
-import RightPanel from "./RightPanel";
 import Sider from "./Sider";
-import TagsView from "./TagsView";
 import { Layout } from "antd";
 const Main = (props) => {
-  const { tagsView } = props;
   return (
     <Layout style={{ minHeight: "100vh" }}>
+      {/* 左侧菜单栏 */}
       <Sider />
       <Layout>
+        {/* 头部 */}
         <Header />
-        {tagsView ? <TagsView /> : null}
+        {/* 主要内容区 */}
         <Content />
-        <RightPanel />
       </Layout>
     </Layout>
   );

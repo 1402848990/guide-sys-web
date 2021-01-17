@@ -39,8 +39,10 @@ const Login = (props) => {
           Cookie.set('userInfo', userInfo, {
             expires: new Date(new Date().getTime() + 1 * 60 * 60 * 1000),
           })
-          message.success('登录成功！')
-         window.location.href = '/dashboard'
+          message.success({content:'登录成功！'})
+          setTimeout(() => {
+            window.location.href = '/dashboard'
+          }, 1000);
           console.log('cookie',Cookie.get('userInfo'))
         } else {
           const res = await axios({
@@ -48,6 +50,9 @@ const Login = (props) => {
             method: 'post',
             data: values,
           })
+          if(res.success){
+            message.success({content:'恭喜您~账户创建成功！'})
+          }
           console.log('res', res)
         }
       }
@@ -171,7 +176,7 @@ const Login = (props) => {
                     )}
                   </Form.Item>
                   <Form.Item>
-                    {getFieldDecorator('regPassWord', {
+                    {getFieldDecorator('passWord', {
                       rules: [
                         {
                           required: key === '2',
@@ -214,7 +219,7 @@ const Login = (props) => {
                     )}
                   </Form.Item>
                   <Form.Item>
-                    {getFieldDecorator('regEmail', {
+                    {getFieldDecorator('email', {
                       rules: [
                         {
                           required: key === '2',
@@ -229,13 +234,13 @@ const Login = (props) => {
                             style={{ color: 'rgba(0,0,0,.25)' }}
                           />
                         }
-                        type='password'
+                        type='email'
                         placeholder='邮箱'
                       />
                     )}
                   </Form.Item>
                   <Form.Item>
-                    {getFieldDecorator('passWord', {
+                    {getFieldDecorator('garde', {
                       rules: [
                         {
                           required: key === '2',
@@ -251,7 +256,6 @@ const Login = (props) => {
                             style={{ color: 'rgba(0,0,0,.25)' }}
                           />
                         }
-                        type='garde'
                         placeholder='年级'
                       />
                     )}

@@ -32,7 +32,7 @@ module.exports = override(
   // 使用less-loader对源码中的less的变量进行重新指定
   addLessLoader({
     javascriptEnabled: true,
-    modifyVars: { "@primary-color": "#1DA57A" },
+    modifyVars: { "@primary-color": "#1890ff" },
   }),
 
   // 配置路径别名

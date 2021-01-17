@@ -5,10 +5,13 @@ import axios from 'axios'
 import baseUrl from './baseUrl'
 import { message } from 'antd'
 import qs from 'qs'
+import Cookie from 'js-cookie'
+
 
 let service = axios.create({
   baseURL: baseUrl,
   timeout: 600000,
+  withCredentials:true
 })
 
 // 响应拦截器
@@ -42,9 +45,10 @@ service.interceptors.response.use(
 // 请求拦截器
 service.interceptors.request.use(
   (config) => {
-    // 在localStorage中取出token塞入请求头部中
-    // const token = localStorage.getItem('token');
-    // config.headers.Authorization = `${token}`;
+    console.log(config)
+    // 在cookie中取出用户信息
+    const cookie = Cookie.get('userInfo')
+    config.headers['Set-Cookie'] = encodeURIComponent(cookie);
     // post请求使用表单的形式提交
     if (config.method === 'post') {
       config.data = qs.stringify(config.data)

@@ -14,6 +14,7 @@ class Router extends React.Component {
           <Route
             path="/"
             render={() => {
+              // 如果cookie中没有用户信息，则跳转到登录页面
               if (!userInfo) {
                 return <Redirect to="/login" />;
               } else {

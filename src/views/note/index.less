@@ -1,0 +1,30 @@
+.note {
+  .ant-list-item:hover {
+    transform: translateY(-8px);
+  }
+  .ant-list-item {
+    transition: all 0.5s;
+    cursor: pointer;
+    box-shadow: 3px 3px 3px #b9b8b8;
+  }
+  .noteCard {
+    .ant-card-head-title{
+      color: #40a9ff;
+    }
+    .ant-card-body {
+      padding: 12px;
+      height: 120px;
+      text-overflow: -o-ellipsis-lastline;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      line-clamp: 3;
+      -webkit-box-orient: vertical;
+    }
+    .meta{
+      position: absolute;
+      bottom: 55px;
+    }
+  }
+}
