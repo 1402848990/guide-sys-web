@@ -174,8 +174,10 @@ export function export_json_to_excel({
   }
 
   if (autoWidth) {
+    console.log('autoWidth',autoWidth)
     /*设置worksheet每列的最大宽度*/
     const colWidth = data.map(row => row.map(val => {
+      console.log('val',val)
       /*先判断是否为null/undefined*/
       if (val == null) {
         return {
@@ -185,11 +187,11 @@ export function export_json_to_excel({
       /*再判断是否为中文*/
       else if (val.toString().charCodeAt(0) > 255) {
         return {
-          'wch': val.toString().length * 2
+          'wch': val.toString().length * 4
         };
       } else {
         return {
-          'wch': val.toString().length
+          'wch': val.toString().length*3
         };
       }
     }))

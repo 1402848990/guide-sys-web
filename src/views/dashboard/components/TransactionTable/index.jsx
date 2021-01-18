@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import { Table, Tag } from "antd";
-import { transactionList } from "@/api/remoteSearch";
 
 const columns = [
   {
@@ -33,15 +32,6 @@ class TransactionTable extends Component {
   _isMounted = false;   // 这个变量是用来标志当前组件是否挂载
   state = {
     list: [],
-  };
-  fetchData = () => {
-    transactionList().then((response) => {
-      console.log('---------response',response)
-      const list = response.data.data.items.slice(0, 13);
-      if (this._isMounted) { 
-        this.setState({ list });
-      }
-    });
   };
   componentDidMount() {
     this._isMounted = true;

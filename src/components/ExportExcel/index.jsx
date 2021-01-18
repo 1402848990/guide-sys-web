@@ -12,46 +12,7 @@ import {
   Collapse,
 } from 'antd'
 
-import { excelList } from '@/api/excel'
 const { Panel } = Collapse
-// const columns = [
-//   {
-//     title: "Id",
-//     dataIndex: "id",
-//     key: "id",
-//     width: 200,
-//     align: "center",
-//   },
-//   {
-//     title: "Title",
-//     dataIndex: "title",
-//     key: "title",
-//     width: 200,
-//     align: "center",
-//   },
-//   {
-//     title: "Author",
-//     key: "author",
-//     dataIndex: "author",
-//     width: 100,
-//     align: "center",
-//     render: (author) => <Tag key={author}>{author}</Tag>,
-//   },
-//   {
-//     title: "Readings",
-//     dataIndex: "readings",
-//     key: "readings",
-//     width: 195,
-//     align: "center",
-//   },
-//   {
-//     title: "Date",
-//     dataIndex: "date",
-//     key: "date",
-//     width: 195,
-//     align: "center",
-//   },
-// ];
 class Excel extends Component {
   _isMounted = false // 这个变量是用来标志当前组件是否挂载
   state = {
@@ -64,17 +25,8 @@ class Excel extends Component {
     selectedRows: [],
     selectedRowKeys: [],
   }
-  fetchData = () => {
-    excelList().then((response) => {
-      const list = response.data.data.items
-      if (this._isMounted) {
-        this.setState({ list })
-      }
-    })
-  }
   componentDidMount() {
     this._isMounted = true
-    this.fetchData()
   }
   componentWillUnmount() {
     this._isMounted = false

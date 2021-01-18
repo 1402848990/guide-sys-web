@@ -217,7 +217,6 @@ export default class UForm extends Component {
         title: item.name,
         dataIndex: item.name,
         width: 180,
-        // render: (_, record) => JSON.parse(record.content)[item.name],
       })
     })
 
@@ -293,11 +292,11 @@ export default class UForm extends Component {
   }
 
   clickDetail = (record) => {
-    window.open(`#addStudent?id=${record.id}`)
+    window.open(`#addStudent?id=${record.stuId}`)
   }
 
   clickEdit = (record) => {
-    window.open(`#addStudent?edit&id=${record.id}`)
+    window.open(`#addStudent?edit&id=${record.stuId}`)
   }
 
   clickDelete = (item) => {

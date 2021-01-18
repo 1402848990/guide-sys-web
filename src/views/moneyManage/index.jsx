@@ -7,25 +7,20 @@ import {
   Row,
   Col,
   Input,
-  Icon,
-  Button,
-  Divider,
-  Rate,
-  Modal,
-  message,
-  Select,
   Card,
+  Checkbox,
+  Radio,
 } from 'antd'
-import CourseTag from '../../components/CourseTag'
-import BaseTable from '../../components/BaseTable'
 import ExportExcel from '../../components/ExportExcel'
+import { DATE } from '../../utils/index'
+import { orderBy } from 'lodash'
 
 const Search = Input.Search
 
 const HOST = 'http://localhost:8088/interface'
 
-const tHeader = ['学号', '姓名', '班级', '性别', '职务']
-const filterVal = ['stuId', 'name', 'garde', 'sex', 'level']
+const tHeader = ['学号', '姓名', '班级', '性别']
+const filterVal = ['stuId', 'stuName', 'garde', 'sex']
 
 export default class UForm extends Component {
   constructor(props) {
@@ -34,8 +29,20 @@ export default class UForm extends Component {
       filter: {},
       dataSource: [],
       loading: true,
+      CourseOpts: [],
+      selectCourse: ['JAVA', '数据结构', '高数'],
+      currDate: '大一上学期',
+      topConfig: {
+        first: 2,
+        second: 4,
+        third: 6,
+      },
+      handledData: [],
+      examContent:[],
+      courseNameList:[]
     }
   }
+
   // 获取数据
   getData = async () => {
     const res = await axios.post(`${HOST}/Stu/list`, {
@@ -52,90 +59,189 @@ export default class UForm extends Component {
       }
     )
   }
+
+  // 获取成绩列表
+  getExam = async () => {
+    const { data } = await axios.post(`${HOST}/Stu/examList`, {
+      filter: this.state.filter,
+    })
+    const handledData = data.map((item) => {
+      const content = JSON.parse(item.content)
+      for (let i in content) {
+        item[i] = content[i]
+      }
+      return item
+    })
+    this.setState({
+      handledData,
+    })
+  }
+
+  // 将成绩按照一定的顺序排序
+  handleExam = (_handledData) => {
+    const { currDate, topConfig, selectCourse } = this.state
+    // 各个班级当前学期的成绩
+    const oneClass = _handledData.filter(
+      (item) => item.garde === '一班' && item.date === currDate
+    )
+    const twoClass = _handledData.filter(
+      (item) => item.garde === '二班' && item.date === currDate
+    )
+    const threeClass = _handledData.filter(
+      (item) => item.garde === '三班' && item.date === currDate
+    )
+    console.log('oneClass', oneClass)
+
+    const oneExam = []
+    const twoExam = []
+    const threeExam = []
+    oneClass.forEach((item) => {
+      let add = 0
+
+      Object.entries(item).forEach((ele) => {
+        const [course, courseVal] = ele
+        if (selectCourse.includes(course)) {
+          add = add + Number(courseVal)
+        }
+      })
+      item.average = +(add / selectCourse.length).toFixed(2)
+      oneExam.push(item)
+    })
+
+    twoClass.forEach((item) => {
+      let add = 0
+
+      Object.entries(item).forEach((ele) => {
+        const [course, courseVal] = ele
+        if (selectCourse.includes(course)) {
+          add = add + Number(courseVal)
+        }
+      })
+      item.average = +(add / selectCourse.length).toFixed(2)
+      twoExam.push(item)
+    })
+
+    threeClass.forEach((item) => {
+      let add = 0
+
+      Object.entries(item).forEach((ele) => {
+        const [course, courseVal] = ele
+        if (selectCourse.includes(course)) {
+          add = add + Number(courseVal)
+        }
+      })
+      item.average = +(add / selectCourse.length).toFixed(2)
+      threeExam.push(item)
+    })
+    // 根据平均分倒序排序
+    return {
+      oneExamOrder: orderBy(oneExam, ['average'],['desc']).slice(0, topConfig.third),
+      twoExamOrder: orderBy(twoExam, ['average'],['desc']).slice(0, topConfig.third),
+      threeExamOrder: orderBy(threeExam, ['average',['desc']]).slice(0, topConfig.third),
+    }
+  }
+
   //姓名输入
-  onChangeUserName = (e, field) => {
-    console.log(e)
+  onChangeTopConfig = (e, field) => {
     if (e) {
       const value = !e?.target ? e : e?.target?.value
-      const _filter = this.state.filter
+      const _pre = this.state.topConfig
       this.setState({
-        filter: {
-          ..._filter,
+        topConfig: {
+          ..._pre,
           [field]: value,
         },
       })
     }
   }
 
-  //渲染
-  componentDidMount() {
-    this.getData()
-  }
-  //搜索按钮
-  btnSearch_Click = () => {
-    this.getData()
-  }
-  //重置按钮
-  btnClear_Click = () => {
-    this.setState(
-      {
-        filter: {},
-      },
-      () => {
-        this.getData()
-      }
-    )
-  }
+  // 获取学科列表
+  getCourse = async () => {
+    const { data: courseList } = await axios({
+      url: 'http://localhost:8088/interface/Stu/courseList',
+      method: 'post',
+    })
+    console.log('courseList', courseList)
+    const _examContent = []
+    const CourseOpts = []
+    const courseNameList = []
 
-  //单选框改变选择
-  checkChange = (selectedRowKeys) => {
-    this.setState({ selectedRowKeys: selectedRowKeys })
-  }
+    courseList.forEach((item) => {
+      courseNameList.push(item.name)
+      _examContent.push({
+        title: item.name,
+        dataIndex: item.name,
+        width: 180,
+      })
+    })
 
-  clickDetail = (record) => {
-    window.open(`#addStudent?id=${record.id}`)
-  }
-
-  clickEdit = (record) => {
-    window.open(`#addStudent?edit&id=${record.id}`)
-  }
-
-  clickDelete = (item) => {
-    const _this = this
-    Modal.confirm({
-      title: `确定删除学生【${item.name}】吗`,
-      content: '',
-      async onOk() {
-        await axios({
-          url: 'http://localhost:8088/interface/Stu/delete',
-          method: 'post',
-          data: { id: item.id },
-        })
-        message.success('删除成功！')
-        _this.getData()
-      },
-      onCancel() {
-        console.log('Cancel')
-      },
+    courseList.forEach((item) => {
+      CourseOpts.push({
+        label: item.name,
+        value: item.name,
+      })
+    })
+    console.log('_examContent',_examContent)
+    this.setState({
+      CourseOpts,
+      examContent: _examContent,
+      courseNameList,
     })
   }
 
-  columns = [
+  //渲染
+  componentDidMount() {
+    this.getData()
+    this.getCourse()
+    this.getExam()
+  }
+
+  clickDetail = (record) => {
+    window.open(`#addStudent?id=${record.stuId}`)
+  }
+
+  columns =()=> [
+    {
+      title: '名次',
+      dataIndex: '',
+      width: 80,
+      render: (_, record, index) => index + 1,
+    },
+    {
+      title: '奖学金等级',
+      dataIndex: '',
+      width: 150,
+      render: (_, record, index) => {
+        console.log('index',index)
+        return index + 1 <= +this.state.topConfig.first
+          ? '一等奖学金'
+          : index + 1 > +this.state.topConfig.first  &&
+            index + 1 <= +this.state.topConfig.second 
+          ? '二等奖学金'
+          : '三等奖学金'
+      },
+    },
     {
       title: '学号',
       dataIndex: 'stuId',
-      width: 80,
+      width: 120,
       sorter: (a, b) => +a.id - +b.id,
     },
     {
       title: '姓名',
-      dataIndex: 'name',
-      width: 180,
+      dataIndex: 'stuName',
+      width: 120,
     },
+    {
+      title: '平均分',
+      dataIndex: 'average',
+      width: 80,
+    },
+    ...this.state.examContent,
     {
       title: '班级',
       dataIndex: 'garde',
-      width: 180,
+      width: 100,
       filters: [
         { text: '一班', value: '一班' },
         { text: '二班', value: '二班' },
@@ -145,32 +251,13 @@ export default class UForm extends Component {
     },
     {
       title: '性别',
-      dataIndex: 'sex',
-      width: 180,
+      dataIndex: 'stuSex',
+      width: 100,
       filters: [
         { text: '男', value: '男' },
         { text: '女', value: '女' },
       ],
       onFilter: (value, record) => record.sex === value,
-    },
-    {
-      title: '职务',
-      dataIndex: 'level',
-      width: 150,
-    },
-    {
-      title: '创建时间',
-      dataIndex: 'createdAt',
-      sorter: (a, b) => +a.createdAt - +b.createdAt,
-      width: 200,
-      render: (value) => moment(+value).format('YYYY-MM-DD HH:mm:ss'),
-    },
-    {
-      title: '更新时间',
-      dataIndex: 'updatedAt',
-      sorter: (a, b) => +a.updatedAt - +b.updatedAt,
-      width: 200,
-      render: (value) => moment(+value).format('YYYY-MM-DD HH:mm:ss'),
     },
     {
       title: '操作',
@@ -179,61 +266,91 @@ export default class UForm extends Component {
       width: 140,
       render: (_, record) => (
         <>
-          <a onClick={() => this.clickDetail(record)}>查看</a>
-          <Divider type='vertical' />
-          <a onClick={() => this.clickEdit(record)}>编辑</a>
-          <Divider type='vertical' />
-          <a onClick={() => this.clickDelete(record)}>删除</a>
+          <a onClick={() => this.clickDetail(record)}>查看此学生</a>
         </>
       ),
     },
   ]
 
   render() {
-    const { filter, dataSource, loading } = this.state
-    console.log(filter)
+    const {
+      filter,
+      dataSource,
+      loading,
+      CourseOpts,
+      currDate,
+      topConfig,
+      selectCourse,
+      handledData,
+      courseNameList
+    } = this.state
+    // 获取各班级排序后的成绩列表
+    const { oneExamOrder, twoExamOrder, threeExamOrder } = this.handleExam(
+      handledData
+    )
+    const tHeader = ['学号', '姓名', '班级', '性别','学期','平均分'].concat(
+      courseNameList
+    )
+    const filterVal = ['stuId', 'stuName', 'garde', 'stuSex','date','average'].concat(
+      courseNameList
+    )
     return (
       <div>
-        <Card title='课程管理'>
-          <CourseTag />
+        <Card title='参与奖学金计算的学科'>
+          <>
+            <Checkbox.Group
+              options={CourseOpts}
+              value={selectCourse}
+              onChange={(arr) => {
+                this.setState({ selectCourse: arr })
+              }}
+            />
+            <br />
+            <br />
+            <h4>选择学期</h4>
+            <Radio.Group
+              type='primary'
+              value={currDate}
+              onChange={(e) => this.setState({ currDate: e.target.value })}
+            >
+              {DATE.map((item) => (
+                <Radio.Button value={item.value}>{item.label}</Radio.Button>
+              ))}
+            </Radio.Group>
+          </>
         </Card>
         <div className='formBody'>
           <Row gutter={16}>
             <Col className='gutter-row' sm={8}>
-                  <span className='filterTitle'>姓名：</span>
-                  <Search
-                    placeholder='请输入姓名'
-                    prefix={<Icon type='user' />}
-                    value={filter.name}
-                    onChange={(e) => this.onChangeUserName(e, 'name')}
-                  />
+              <span className='filterTitle'>一等奖学金：</span>
+              <Input
+                addonBefore='前'
+                addonAfter='名'
+                value={topConfig.first}
+                onChange={(e) => this.onChangeTopConfig(e, 'first')}
+              />
             </Col>
             <Col className='gutter-row' sm={8}>
-            <span className='filterTitle'>班级：</span>
-              <Select
-                placeholder='请选择班级'
-                style={{ width: '100%' }}
-                prefix={<Icon type='user' />}
-                value={filter.garde}
-                onChange={(e) => this.onChangeUserName(e, 'garde')}
-              >
-                <Select.Option value='一班'>一班</Select.Option>
-                <Select.Option value='二班'>二班</Select.Option>
-                <Select.Option value='三班'>三班</Select.Option>
-              </Select>
+              <span className='filterTitle'>二等奖学金：</span>
+              <Input
+                addonBefore='前'
+                addonAfter='名'
+                value={topConfig.second}
+                onChange={(e) => this.onChangeTopConfig(e, 'second')}
+              />
             </Col>
             <Col className='gutter-row' sm={8}>
-            <span className='filterTitle'>职务：</span>
-              <Search
-                placeholder='请输入职务'
-                prefix={<Icon type='user' />}
-                value={filter.level}
-                onChange={(e) => this.onChangeUserName(e, 'level')}
+              <span className='filterTitle'>三等奖学金：</span>
+              <Input
+                addonBefore='前'
+                addonAfter='名'
+                value={topConfig.third}
+                onChange={(e) => this.onChangeTopConfig(e, 'third')}
               />
             </Col>
           </Row>
           <Row gutter={16}>
-            <Button
+            {/* <Button
               type='primary'
               onClick={() => {
                 window.open('#addStudent')
@@ -241,43 +358,35 @@ export default class UForm extends Component {
               style={{ marginLeft: '8px' }}
             >
               添加学生
-            </Button>
-            <div className='btnOpera'>
-              <Button
-                type='primary'
-                onClick={this.btnSearch_Click}
-                style={{ marginRight: '10px' }}
-              >
-                查询
-              </Button>
-              <Button
-                type='primary'
-                onClick={this.btnClear_Click}
-                style={{
-                  background: '#f8f8f8',
-                  color: '#108ee9',
-                  marginRight: '10px',
-                }}
-              >
-                重置
-              </Button>
-            </div>
+            </Button> */}
           </Row>
-          {/* <BaseTable
-            columns={this.columns}
-            dataSource={dataSource}
-            checkChange={this.checkChange}
-            onDelete={this.onDelete}
-            editClick={this.editClick}
-            loading={loading}
-          /> */}
-          <ExportExcel
-            loading={loading}
-            tHeader={tHeader}
-            filterVal={filterVal}
-            columns={this.columns}
-            data={dataSource}
-          />
+          <Card title='一班奖学金获奖名单'>
+            <ExportExcel
+              loading={loading}
+              tHeader={tHeader}
+              filterVal={filterVal}
+              columns={this.columns()}
+              data={oneExamOrder}
+            />
+          </Card>
+          <Card title='二班奖学金获奖名单'>
+            <ExportExcel
+              loading={loading}
+              tHeader={tHeader}
+              filterVal={filterVal}
+              columns={this.columns()}
+              data={twoExamOrder}
+            />
+          </Card>
+          <Card title='三班奖学金获奖名单'>
+            <ExportExcel
+              loading={loading}
+              tHeader={tHeader}
+              filterVal={filterVal}
+              columns={this.columns()}
+              data={threeExamOrder}
+            />
+          </Card>
         </div>
       </div>
     )

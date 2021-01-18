@@ -10,6 +10,8 @@ import './index.less'
 const { Header } = Layout
 
 const LayoutHeader = (props) => {
+  const userInfo = Cookie.get('userInfo')
+  console.log('userInfo', userInfo)
   const {
     token,
     avatar,
@@ -19,7 +21,7 @@ const LayoutHeader = (props) => {
     showSettings,
     fixedHeader,
   } = props
-  console.log('props',props)
+  console.log('props', props)
   token && getUserInfo(token)
   const handleLogout = (token) => {
     Modal.confirm({
@@ -47,17 +49,8 @@ const LayoutHeader = (props) => {
       <Menu.Item key='dashboard'>
         <Link to='/dashboard'>首页</Link>
       </Menu.Item>
-      <Menu.Item key='project'>
-        <a
-          target='_blank'
-          href='https://github.com/NLRX-WJC/react-antd-admin-template'
-          rel='noopener noreferrer'
-        >
-          项目地址
-        </a>
-      </Menu.Item>
       <Menu.Divider />
-      <Menu.Item key='logout'>注销</Menu.Item>
+      <Menu.Item key='logout'>退出</Menu.Item>
     </Menu>
   )
   const computedStyle = () => {
@@ -96,7 +89,7 @@ const LayoutHeader = (props) => {
           <div className='dropdown-wrap'>
             <Dropdown overlay={menu}>
               <div>
-                <Avatar shape='square' size='medium' src={avatar} />
+              设置
                 <Icon style={{ color: 'rgba(0,0,0,.3)' }} type='caret-down' />
               </div>
             </Dropdown>
