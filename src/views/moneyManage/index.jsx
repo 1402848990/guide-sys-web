@@ -322,7 +322,7 @@ export default class UForm extends Component {
         <div className='formBody'>
           <Row gutter={16}>
             <Col className='gutter-row' sm={8}>
-              <span className='filterTitle'>一等奖学金：</span>
+              <span style={{color:'red'}} className='filterTitle'>一等奖学金：</span>
               <Input
                 addonBefore='前'
                 addonAfter='名'
@@ -331,7 +331,7 @@ export default class UForm extends Component {
               />
             </Col>
             <Col className='gutter-row' sm={8}>
-              <span className='filterTitle'>二等奖学金：</span>
+              <span style={{color:'#9C27B0'}} className='filterTitle'>二等奖学金：</span>
               <Input
                 addonBefore='前'
                 addonAfter='名'
@@ -340,7 +340,7 @@ export default class UForm extends Component {
               />
             </Col>
             <Col className='gutter-row' sm={8}>
-              <span className='filterTitle'>三等奖学金：</span>
+              <span style={{color:'#795548'}} className='filterTitle'>三等奖学金：</span>
               <Input
                 addonBefore='前'
                 addonAfter='名'

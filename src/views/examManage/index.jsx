@@ -379,11 +379,11 @@ export default class UForm extends Component {
       width: 140,
       render: (_, record) => (
         <>
-          <a onClick={() => this.clickDetail(record)}>查看</a>
-          <Divider type='vertical' />
+          <a onClick={() => this.clickDetail(record)}>查看学生</a>
+          {/* <Divider type='vertical' />
           <a onClick={() => this.clickEdit(record)}>编辑</a>
           <Divider type='vertical' />
-          <a onClick={() => this.clickDelete(record)}>删除</a>
+          <a onClick={() => this.clickDelete(record)}>删除</a> */}
         </>
       ),
     },
@@ -498,15 +498,6 @@ export default class UForm extends Component {
             </Col> */}
           </Row>
           <Row gutter={16}>
-            <Button
-              type='primary'
-              onClick={() => {
-                window.open('#addStudent')
-              }}
-              style={{ marginLeft: '8px' }}
-            >
-              添加学生
-            </Button>
             <div className='btnOpera'>
               <Button
                 type='primary'

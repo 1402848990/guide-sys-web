@@ -9,11 +9,6 @@ const menuList = [
     icon: 'home',
   },
   {
-    title: '个人中心',
-    path: '/userInfo',
-    icon: 'user',
-  },
-  {
     title: '通讯录',
     path: '/contact',
     icon: 'solution',
@@ -42,6 +37,11 @@ const menuList = [
     title: '奖学金管理',
     path: '/moneyManage',
     icon: 'pay-circle',
+  },
+  {
+    title: '个人中心',
+    path: '/userInfo',
+    icon: 'user',
   },
 ]
 export default menuList

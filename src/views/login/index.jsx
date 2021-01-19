@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { Redirect } from 'react-router-dom'
 import { Form, Icon, Input, Button, message, Spin, Tabs, Select } from 'antd'
-import { connect } from 'react-redux'
 import DocumentTitle from 'react-document-title'
 import axios from '../../request/axiosConfig'
 import api from '../../request/api/api_user'

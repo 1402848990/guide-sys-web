@@ -3,7 +3,6 @@ import { Icon, Menu, Dropdown, Modal, Layout, Avatar } from 'antd'
 import { Link, withRouter } from 'react-router-dom'
 import FullScreen from '@/components/FullScreen'
 import Settings from '@/components/Settings'
-import Hamburger from '@/components/Hamburger'
 import BreadCrumb from '@/components/BreadCrumb'
 import Cookie from 'js-cookie'
 import './index.less'
@@ -81,7 +80,6 @@ const LayoutHeader = (props) => {
         style={computedStyle()}
         className={fixedHeader ? 'fix-header' : ''}
       >
-        <Hamburger />
         <BreadCrumb />
         <div className='right-menu'>
           <FullScreen />
