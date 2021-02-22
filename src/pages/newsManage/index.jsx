@@ -33,7 +33,7 @@ export default class UForm extends Component {
   }
   // 获取数据
   getData = async () => {
-    const res = await axios.post(`${HOST}/User/planList`, {
+    const res = await axios.post(`${HOST}/User/newsList`, {
       filter: this.state.filter,
     })
     this.setState(
@@ -88,17 +88,17 @@ export default class UForm extends Component {
   }
 
   clickDetail = (record) => {
-    window.open(`#baseWorkPlan?id=${record.id}`)
+    window.open(`#baseNews?id=${record.id}`)
   }
 
   clickEdit = (record) => {
-    window.open(`#baseWorkPlan?id=${record.id}&edit`)
+    window.open(`#baseNews?id=${record.id}&edit`)
   }
 
   clickDelete = (item) => {
     const _this = this
     Modal.confirm({
-      title: `确定删除工作计划吗`,
+      title: `确定删除这条资讯吗`,
       content: '',
       async onOk() {
         await axios({
@@ -123,18 +123,23 @@ export default class UForm extends Component {
       sorter: (a, b) => +a.id - +b.id,
     },
     {
-      title: '计划名',
+      title: '资讯标题',
       dataIndex: 'title',
       width: 180,
     },
     {
-      title: '重要等级',
-      dataIndex: 'level',
-      width: 150,
-      render: (value) => <Rate disabled value={value} />,
+      title: '所属版块',
+      dataIndex: 'section',
+      width: 180,
     },
     {
-      title: '创建时间',
+      title: '推荐指数',
+      dataIndex: 'level',
+      width: 150,
+      render: (value) => <Rate  character={<Icon type='heart' />} disabled value={value} />,
+    },
+    {
+      title: '发布时间',
       dataIndex: 'createdAt',
       sorter: (a, b) => +a.createdAt - +b.createdAt,
       width: 200,
@@ -172,7 +177,7 @@ export default class UForm extends Component {
           <Row gutter={16}>
             <Col className='gutter-row' sm={8}>
               <Search
-                placeholder='请输入计划名'
+                placeholder='请输入资讯标题'
                 prefix={<Icon type='user' />}
                 value={filter.title}
                 onChange={(e) => this.onChangeUserName(e, 'title')}
@@ -180,7 +185,7 @@ export default class UForm extends Component {
             </Col>
             <Col className='gutter-row' sm={8}>
               <Select
-                placeholder='请选择重要等级'
+                placeholder='请选择推荐指数'
                 style={{ width: '100%' }}
                 prefix={<Icon type='user' />}
                 value={filter.level}
@@ -198,11 +203,11 @@ export default class UForm extends Component {
             <Button
               type='primary'
               onClick={() => {
-                window.open('#baseWorkPlan')
+                window.open('#baseNews')
               }}
               style={{ marginLeft: '8px' }}
             >
-              新建工作计划
+              发布资讯
             </Button>
             <div className='btnOpera'>
               <Button

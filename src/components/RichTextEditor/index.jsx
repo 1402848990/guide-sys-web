@@ -8,7 +8,10 @@ import {
   Rate,
   message,
   Descriptions,
+  Icon,
+  Select,
 } from 'antd'
+import { Section } from '../../utils/enum'
 import axios from '../../request/axiosConfig'
 import { EditorState, convertToRaw, ContentBlock, ContentState } from 'draft-js'
 import { Editor } from 'react-draft-wysiwyg'
@@ -18,12 +21,18 @@ import htmlToDraft from 'html-to-draftjs'
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
 import './index.less'
 import moment from 'moment'
+import Item from 'antd/lib/list/Item'
 
 const HOST = 'http://localhost:8088/interface'
+const sectionOpt = Section.map((item) => (
+  <Select.Option value={item}>{item}</Select.Option>
+))
 
 const RichTextEditor = () => {
   // 标题
   const [title, setTitle] = useState('')
+  // 版块
+  const [section, setSection] = useState('')
   // 内容
   const [editorState, setEditorState] = useState(EditorState.createEmpty())
   // 重要等级
@@ -57,6 +66,7 @@ const RichTextEditor = () => {
             contentBlock.contentBlocks
           )
           setTitle(record.title)
+          setSection(record.section)
           setLevel(record.level)
           setEditorState(EditorState.createWithContent(contentState))
           setDetail(record)
@@ -71,6 +81,7 @@ const RichTextEditor = () => {
               contentBlock.contentBlocks
             )
             setTitle(record.title)
+            setSection(record.section)
             setLevel(record.level)
             setEditorState(EditorState.createWithContent(contentState))
             setDetail(record)
@@ -90,17 +101,19 @@ const RichTextEditor = () => {
     const res = await axios({
       url: edit
         ? 'http://localhost:8088/interface/User/updatePlan'
-        : 'http://localhost:8088/interface/User/addPlan',
+        : 'http://localhost:8088/interface/User/addNews',
       method: 'post',
       data: edit
         ? {
             id: detail.id,
+            section,
             title,
             level,
             content: draftToHtml(convertToRaw(editorState.getCurrentContent())),
           }
         : {
             title,
+            section,
             level,
             content: draftToHtml(convertToRaw(editorState.getCurrentContent())),
           },
@@ -112,9 +125,10 @@ const RichTextEditor = () => {
 
   return (
     <div>
-      <Card bordered={false} title='工作计划'>
+      <Card bordered={false} title='我的资讯'>
         {show ? (
-          <Descriptions title='工作计划基本信息'>
+          <Descriptions title='资讯基本信息'>
+            <Descriptions.Item label='发布人'>{detail.userName}</Descriptions.Item>
             <Descriptions.Item label='创建时间'>
               {moment(+detail.createdAt).format('YYYY-MM-DD HH:mm:ss')}
             </Descriptions.Item>
@@ -123,7 +137,7 @@ const RichTextEditor = () => {
             </Descriptions.Item>
           </Descriptions>
         ) : null}
-        <h1>工作计划标题：</h1>
+        <h1>资讯标题：</h1>
         {show ? (
           title
         ) : (
@@ -134,10 +148,16 @@ const RichTextEditor = () => {
             }}
           />
         )}
+        <h1 style={{marginTop:'20px'}}>所属版块：</h1>
+        {show ? (
+          section
+        ) : (
+          <Select value={section} style={{width:'100%'}} onChange={(e) => setSection(e)}>{sectionOpt}</Select>
+        )}
         {/* 富文本编辑器 */}
         {!show && (
           <>
-            <h1 style={{ marginTop: '10px' }}>工作计划内容：</h1>
+            <h1 style={{ marginTop: '20px' }}>资讯内容：</h1>
             <Editor
               editorState={editorState}
               onEditorStateChange={onEditorStateChange}
@@ -150,7 +170,7 @@ const RichTextEditor = () => {
         )}
         {show && (
           <>
-            <h1 style={{ marginTop: '10px' }}>工作计划内容：</h1>
+            <h1 style={{ marginTop: '10px' }}>资讯内容：</h1>
             <div
               dangerouslySetInnerHTML={{
                 __html: draftToHtml(
@@ -161,8 +181,9 @@ const RichTextEditor = () => {
           </>
         )}
         {/* 重要等级 */}
-        <h1 style={{ marginTop: '10px' }}>重要等级：</h1>
+        <h1 style={{ marginTop: '10px' }}>推荐指数：</h1>
         <Rate
+          character={<Icon type='heart' />}
           value={level}
           onChange={(val) => {
             setLevel(val)
@@ -173,9 +194,9 @@ const RichTextEditor = () => {
           <Button
             type='primary'
             onClick={submit}
-            style={{ marginTop: '20px', width: '200px' }}
+            style={{ marginTop: '20px', width: '200px',float:'right',height:'40px' }}
           >
-            提交
+            确认发布
           </Button>
         )}
       </Card>

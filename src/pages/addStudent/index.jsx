@@ -308,7 +308,7 @@ class UserInfo extends React.Component {
       name,
       level,
       stuId,
-    } = this.state.userInfo
+    } = this.state.userInfo||{}
     const { courseNameList, examList = [] } = this.state
     const tHeader = ['学号', '姓名', '学期', '班级', '性别'].concat(
       courseNameList

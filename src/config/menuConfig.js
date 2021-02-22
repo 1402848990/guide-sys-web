@@ -19,8 +19,8 @@ const menuList = [
     icon: 'book',
   },
   {
-    title: '工作计划',
-    path: '/workPlan',
+    title: '资讯管理',
+    path: '/newsManage',
     icon: 'schedule',
   },
   {

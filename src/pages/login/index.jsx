@@ -4,11 +4,17 @@ import { Form, Icon, Input, Button, message, Spin, Tabs, Select } from 'antd'
 import DocumentTitle from 'react-document-title'
 import axios from '../../request/axiosConfig'
 import api from '../../request/api/api_user'
+import request from 'axios'
 import Cookie from 'js-cookie'
 import { browserHistory } from 'react-router'
+import {Department,Level} from '../../utils/enum'
 import './index.less'
 
 const { TabPane } = Tabs
+// 科室选项
+const DepartmentOpt = Department.map(item=><Select.Option key={item} value={item}>{item}</Select.Option>)
+// 职称选项
+const LevelOpt = Level.map(item=><Select.Option key={item} value={item}>{item}</Select.Option>)
 
 const Login = (props) => {
   const { form, token, login, getUserInfo } = props
@@ -62,7 +68,7 @@ const Login = (props) => {
     return <Redirect to='/dashboard' />
   }
   return (
-    <DocumentTitle title={'导员登录'}>
+    <DocumentTitle title={'医生登录'}>
       <div className='login-container'>
         <div className='content'>
           <Spin spinning={loading} tip='登录中...'>
@@ -71,18 +77,18 @@ const Login = (props) => {
               defaultActiveKey='1'
               onChange={(e) => setKey(e)}
             >
-              <TabPane tab='导员登录' key='1'>
+              <TabPane tab='医生登录' key='1'>
                 <Form onSubmit={handleSubmit}>
                   <Form.Item>
-                    {getFieldDecorator('userName', {
+                    {getFieldDecorator('phone', {
                       rules: [
                         {
                           required: true,
                           whitespace: true,
-                          message: '请输入用户名',
+                          message: '请输入手机号',
                         },
                       ],
-                      initialValue: 'admin', // 初始值
+                      initialValue: '15555555555', // 初始值
                     })(
                       <Input
                         prefix={
@@ -91,7 +97,7 @@ const Login = (props) => {
                             style={{ color: 'rgba(0,0,0,.25)' }}
                           />
                         }
-                        placeholder='用户名'
+                        placeholder='手机号'
                       />
                     )}
                   </Form.Item>
@@ -130,9 +136,9 @@ const Login = (props) => {
                 </Form>
               </TabPane>
               {/* 注册模块 */}
-              <TabPane tab='导员注册' key='2'>
+              <TabPane tab='医生注册' key='2'>
                 <Form onSubmit={handleSubmit}>
-                  <Form.Item>
+                  {/* <Form.Item>
                     {getFieldDecorator('userName', {
                       rules: [
                         {
@@ -152,9 +158,10 @@ const Login = (props) => {
                         placeholder='用户名'
                       />
                     )}
-                  </Form.Item>
+                  </Form.Item> */}
+                  
                   <Form.Item>
-                    {getFieldDecorator('reallyName', {
+                    {getFieldDecorator('userName', {
                       rules: [
                         {
                           required: key === '2',
@@ -171,6 +178,27 @@ const Login = (props) => {
                           />
                         }
                         placeholder='真实姓名'
+                      />
+                    )}
+                  </Form.Item>
+                  <Form.Item>
+                    {getFieldDecorator('phone', {
+                      rules: [
+                        {
+                          required: key === '2',
+                          message: '请输入手机号',
+                        },
+                      ],
+                    })(
+                      <Input
+                        prefix={
+                          <Icon
+                            type='lock'
+                            style={{ color: 'rgba(0,0,0,.25)' }}
+                          />
+                        }
+                        type='phone'
+                        placeholder='手机号'
                       />
                     )}
                   </Form.Item>
@@ -197,11 +225,11 @@ const Login = (props) => {
                     )}
                   </Form.Item>
                   <Form.Item>
-                    {getFieldDecorator('phone', {
+                    {getFieldDecorator('address', {
                       rules: [
                         {
                           required: key === '2',
-                          message: '请输入手机号',
+                          message: '请输入地址',
                         },
                       ],
                     })(
@@ -212,51 +240,43 @@ const Login = (props) => {
                             style={{ color: 'rgba(0,0,0,.25)' }}
                           />
                         }
-                        type='phone'
-                        placeholder='手机号'
+                        placeholder='地址'
                       />
                     )}
                   </Form.Item>
                   <Form.Item>
-                    {getFieldDecorator('email', {
-                      rules: [
-                        {
-                          required: key === '2',
-                          message: '请输入邮箱',
-                        },
-                      ],
-                    })(
-                      <Input
-                        prefix={
-                          <Icon
-                            type='lock'
-                            style={{ color: 'rgba(0,0,0,.25)' }}
-                          />
-                        }
-                        type='email'
-                        placeholder='邮箱'
-                      />
-                    )}
-                  </Form.Item>
-                  <Form.Item>
-                    {getFieldDecorator('garde', {
+                    {getFieldDecorator('department', {
                       rules: [
                         {
                           required: key === '2',
                           whitespace: true,
-                          message: '请输入年级',
+                          message: '请选择科室',
                         },
                       ],
                     })(
-                      <Input
-                        prefix={
-                          <Icon
-                            type='lock'
-                            style={{ color: 'rgba(0,0,0,.25)' }}
-                          />
+                      <Select placeholder='科室'>
+                        {
+                          DepartmentOpt
                         }
-                        placeholder='年级'
-                      />
+                      </Select>
+                    )}
+                  </Form.Item>
+                  <Form.Item>
+                    {getFieldDecorator('level', {
+                      rules: [
+                        {
+                          required: key === '2',
+                          whitespace: true,
+                          message: '请选择职级',
+                        },
+                      ],
+                    })(
+                      <Select 
+                      placeholder='职级'>
+                        {
+                          LevelOpt
+                        }
+                      </Select>
                     )}
                   </Form.Item>
                   <Form.Item>

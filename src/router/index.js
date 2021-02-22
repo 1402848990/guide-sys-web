@@ -1,7 +1,7 @@
 import React from "react";
 import { HashRouter, Route, Switch, Redirect } from "react-router-dom";
-import Layout from "@/views/layout";
-import Login from "@/views/login";
+import Layout from "@/pages/layout";
+import Login from "@/pages/login";
 import Cookie from 'js-cookie'
 class Router extends React.Component {
   render() {
