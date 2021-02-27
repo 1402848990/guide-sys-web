@@ -45,37 +45,6 @@ const Dashboard = () => {
         contactList={contactList}
         handleSetLineChartData={handleSetLineChartData}
       />
-
-      <Carousel autoplay>
-        <div>
-          <img
-            height='560px'
-            width='100%'
-            src={require('../../assets/images/bg.png')}
-          />
-        </div>
-        <div>
-          <img
-            height='560px'
-            width='100%'
-            src={require('../../assets/images/bg6.jpg')}
-          />
-        </div>
-        <div>
-          <img
-            height='560px'
-            width='100%'
-            src={require('../../assets/images/bg2.png')}
-          />
-        </div>
-        <div>
-          <img
-            height='560px'
-            width='100%'
-            src={require('../../assets/images/bg5.png')}
-          />
-        </div>
-      </Carousel>
     </div>
   )
 }

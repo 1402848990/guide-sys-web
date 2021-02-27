@@ -245,6 +245,41 @@ const Login = (props) => {
                     )}
                   </Form.Item>
                   <Form.Item>
+                    {getFieldDecorator('age', {
+                      rules: [
+                        {
+                          required: key === '2',
+                          message: '请输入年龄',
+                        },
+                      ],
+                    })(
+                      <Input
+                        prefix={
+                          <Icon
+                            type='lock'
+                            style={{ color: 'rgba(0,0,0,.25)' }}
+                          />
+                        }
+                        placeholder='年龄'
+                      />
+                    )}
+                  </Form.Item>
+                  <Form.Item>
+                    {getFieldDecorator('sex', {
+                      rules: [
+                        {
+                          required: key === '2',
+                          message: '请选择性别',
+                        },
+                      ],
+                    })(
+                      <Select placeholder='性别'>
+                       <Select.Option value='1'>男</Select.Option>
+                       <Select.Option value='2'>女</Select.Option>
+                      </Select>
+                    )}
+                  </Form.Item>
+                  <Form.Item>
                     {getFieldDecorator('department', {
                       rules: [
                         {

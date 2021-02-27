@@ -1,3 +1,6 @@
+/**
+ * 具备基本能力的表单
+ */
 import React from 'react'
 import { Form, Input, Select } from 'antd'
 

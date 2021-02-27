@@ -14,19 +14,23 @@ import {
   Input,
   Select,
   message,
+  DatePicker,
 } from 'antd'
+import moment from 'moment'
 import axios from '../../request/axiosConfig'
+import { sample } from 'lodash'
 import './index.less'
 
 const { confirm } = Modal
+const COLOR = ['#ff5722', '#795548', '#9c27b0', '#4caf50']
 
-class Contact extends React.Component {
+class drugs extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
       list: [],
       visible: false,
-      contactDetail: {},
+      drugsDetail: {},
     }
   }
 
@@ -34,10 +38,10 @@ class Contact extends React.Component {
     this.getUserInfo()
   }
 
-  // 获取联系人信息
+  // 获取药品信息
   getUserInfo = async () => {
     const res = await axios({
-      url: 'http://localhost:8088/interface/User/contactList',
+      url: 'http://localhost:8088/interface/Drugs/drugsList',
       method: 'post',
     })
     this.setState({
@@ -48,27 +52,29 @@ class Contact extends React.Component {
 
   // 提交
   handleSubmit = () => {
-    console.log(this.state.contactDetail)
-    const { validateFields,resetFields } = this.props.form
-    const update = this.state.contactDetail.name
-    const { id } = this.state.contactDetail
+    console.log(this.state.drugsDetail)
+    const { validateFields, resetFields } = this.props.form
+    const update = this.state.drugsDetail.name
+    const { id } = this.state.drugsDetail
     validateFields(async (err, values) => {
+      console.log('values', values)
+      values.date = moment(values.date).format('YYYY-MM-DD')
       if (!err) {
         const res = await axios({
           url: update
-            ? 'http://localhost:8088/interface/User/updateContact'
-            : 'http://localhost:8088/interface/User/addContact',
+            ? 'http://localhost:8088/interface/Drugs/updatedrugs'
+            : 'http://localhost:8088/interface/Drugs/adddrugs',
           method: 'post',
           data: update ? { ...values, id } : values,
         })
         if (res.success) {
           message.success({
-            content: update ? '联系人更新成功！' : '联系人创建成功！',
+            content: update ? '药品更新成功！' : '药品创建成功！',
           })
           resetFields()
           this.setState(
             {
-              contactDetail: {},
+              drugsDetail: {},
             },
             () => {
               this.setState({
@@ -77,9 +83,9 @@ class Contact extends React.Component {
             }
           )
           this.setState({
-            contactDetail: {},
+            drugsDetail: {},
           })
-          // 获取最新联系人列表
+          // 获取最新药品列表
           this.getUserInfo()
         }
       }
@@ -89,47 +95,33 @@ class Contact extends React.Component {
   renderTitle = () => (
     <Row type='flex' align='middle'>
       <Col span={18}>
-        <h3>通讯录</h3>
+        <h3>药品管理</h3>
       </Col>
       <Col style={{ textAlign: 'right' }} className='titleBtn' span={6}>
         <Button
           onClick={() => {
-            this.setState({contactDetail:{} },()=>{
-             this.setState({
-              visible:true
-             })
+            this.setState({ drugsDetail: {} }, () => {
+              this.setState({
+                visible: true,
+              })
             })
           }}
           type='primary'
         >
-          +新建联系人
+          +添加药品
         </Button>
       </Col>
     </Row>
   )
 
-  renderGroup = () => (
-    <Select>
-      <Select.Option key='班级' value='班级'>
-        班级
-      </Select.Option>
-      <Select.Option key='院系' value='院系'>
-        院系
-      </Select.Option>
-      <Select.Option key='校内' value='校内'>
-        校内
-      </Select.Option>
-    </Select>
-  )
-
   delete = (item) => {
     const _this = this
     confirm({
-      title: `确定删除联系人 ${item.name} 吗`,
+      title: `确定删除药品 ${item.name} 吗`,
       content: '',
       async onOk() {
         await axios({
-          url: 'http://localhost:8088/interface/User/deleteContact',
+          url: 'http://localhost:8088/interface/Drugs/deletedrugs',
           method: 'post',
           data: { id: item.id },
         })
@@ -145,7 +137,7 @@ class Contact extends React.Component {
   edit = (item) => {
     this.setState(
       {
-        contactDetail: item,
+        drugsDetail: item,
       },
       () => {
         this.setState({
@@ -156,11 +148,11 @@ class Contact extends React.Component {
   }
 
   render() {
-    const { getFieldDecorator,resetFields } = this.props.form
-    const { list, contactDetail } = this.state
-    console.log('contactDetail',contactDetail)
+    const { getFieldDecorator, resetFields } = this.props.form
+    const { list, drugsDetail } = this.state
+    console.log('drugsDetail', drugsDetail)
     return (
-      <div className='contact'>
+      <div className='drugs'>
         <Card title={this.renderTitle()}>
           <List
             className='demo-loadmore-list'
@@ -184,24 +176,33 @@ class Contact extends React.Component {
                 <Skeleton avatar title={false} loading={item.loading} active>
                   <List.Item.Meta
                     avatar={
-                    <Avatar style={{ backgroundColor: '#87d068' }} size={48}>{item.name.split('')[0]}</Avatar>
+                      <Avatar
+                        shape='square'
+                        style={{ backgroundColor: sample(COLOR) }}
+                        size={48}
+                      >
+                        {item.name}
+                      </Avatar>
                     }
                     title={
                       <a href=''>
-                        {`${item.name}`}&nbsp;&nbsp;&nbsp;&nbsp;
-                        {`${item.phone}`}
+                        {`${item.name}`}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        {`编号：${item.id}`}
                       </a>
                     }
                     description={
                       <Row>
-                        <Col span={6}>{`邮箱：${item.email || '-'}`}</Col>
-                        <Col span={6}>{`地址：${item.address || '-'}`}</Col>
-                        <Col span={6}>{`备注：${item.remark || '-'}`}</Col>
+                        <Col span={6}>{`入库日期：${moment(item.credtedAt).format('YYYY-MM-DD HH:mm:ss') || '-'}`}</Col>
+                        <Col span={6}>{`生产日期：${item.date || '-'}`}</Col>
+                        <Col span={6}>{`保质期：${item.proDate || '-'}`}</Col>
+                        <Col span={6}>{`生产厂家：${item.factory || '-'}`}</Col>
+                        <Col span={6}>{`存放位置：${item.site || '-'}`}</Col>
+                        <Col span={6}>{`采购员：${item.buyUserName || '-'}`}</Col>
                       </Row>
                     }
                   />
                   <div>
-                    <Tag color='magenta'>{item.group}</Tag>
+                    <Tag size='28px' color='magenta'>{item.num}</Tag>
                   </div>
                 </Skeleton>
               </List.Item>
@@ -209,91 +210,93 @@ class Contact extends React.Component {
           />
           <Modal
             width={800}
-            title='新建联系人'
+            title='新建药品'
             visible={this.state.visible}
             onOk={this.handleSubmit}
             onCancel={() => {
-              this.setState({ visible: false, contactDetail: {} })
+              this.setState({ visible: false, drugsDetail: {} })
               resetFields()
             }}
           >
-            <Form key={`${contactDetail.name}`} onSubmit={this.handleSubmit}>
+            <Form key={`${drugsDetail.name}`} onSubmit={this.handleSubmit}>
               <Row gutter={40}>
                 <Col span={12}>
                   {' '}
-                  <Form.Item label='姓名'>
+                  <Form.Item label='药品名'>
                     {getFieldDecorator('name', {
                       rules: [
                         {
                           required: true,
-                          message: '请输入姓名',
+                          message: '请输入药品名',
                         },
                       ],
-                      initialValue: contactDetail.name,
-                    })(<Input placeholder='姓名' />)}
+                      initialValue: drugsDetail.name,
+                    })(<Input placeholder='药品名' />)}
                   </Form.Item>
                 </Col>
                 <Col span={12}>
                   {' '}
-                  <Form.Item label='电话'>
-                    {getFieldDecorator('phone', {
+                  <Form.Item label='生产厂家'>
+                    {getFieldDecorator('factory', {
                       rules: [
                         {
-                          required: true,
-                          message: '请输入电话',
+                          // required: true,
+                          message: '请输入生产厂家',
                         },
                       ],
-                      initialValue: contactDetail.phone,
-                    })(<Input placeholder='电话' />)}
+                      initialValue: drugsDetail.factory,
+                    })(<Input placeholder='生产厂家' />)}
                   </Form.Item>
                 </Col>
               </Row>
               <Row gutter={40}>
                 <Col span={12}>
                   {' '}
-                  <Form.Item label='邮箱'>
-                    {getFieldDecorator('email', {
-                      initialValue: contactDetail.email,
+                  <Form.Item label='生产日期'>
+                    {getFieldDecorator('date', {
+                      initialValue: moment(drugsDetail.date),
                       rules: [
                         {
                           required: true,
-                          message: '请输入邮箱',
+                          message: '请输入生产日期',
                         },
                       ],
-                    })(<Input placeholder='邮箱' />)}
+                    })(<DatePicker placeholder='生产日期' />)}
                   </Form.Item>
                 </Col>
                 <Col span={12}>
                   {' '}
-                  <Form.Item label='地址'>
-                    {getFieldDecorator('address', {
-                      initialValue: contactDetail.address,
-                    })(<Input placeholder='地址' />)}
+                  <Form.Item label='保质期'>
+                    {getFieldDecorator('proDate', {
+                      initialValue: drugsDetail.proDate,
+                    })(<Input placeholder='保质期' />)}
                   </Form.Item>
                 </Col>
               </Row>
               <Row gutter={40}>
                 <Col span={12}>
                   {' '}
-                  <Form.Item label='备注'>
-                    {getFieldDecorator('remark', {
-                      initialValue: contactDetail.remark,
-                    })(<Input placeholder='备注' />)}
+                  <Form.Item label='存放位置'>
+                    {getFieldDecorator('site', {
+                      initialValue: drugsDetail.site,
+                    })(<Input placeholder='存放位置' />)}
                   </Form.Item>
                 </Col>
                 <Col span={12}>
+                  <Form.Item label='采购员'>
+                    {getFieldDecorator('buyUserName', {
+                      initialValue: drugsDetail.buyUserName,
+                    })(<Input placeholder='采购员' />)}
+                  </Form.Item>
+                </Col>
+              </Row>
+              <Row gutter={40}>
+                <Col span={12}>
                   {' '}
-                  <Form.Item label='分组'>
-                    {getFieldDecorator('group', {
-                      initialValue: contactDetail.group,
-                      rules: [
-                        {
-                          required: true,
-                          whitespace: true,
-                          message: '请选择分组',
-                        },
-                      ],
-                    })(this.renderGroup())}
+                  <Form.Item label='数量'>
+                    {getFieldDecorator('num', {
+                      initialValue: drugsDetail.num || 100,
+                    })(<Input placeholder='数量' />)}
                   </Form.Item>
                 </Col>
               </Row>
@@ -304,4 +307,4 @@ class Contact extends React.Component {
     )
   }
 }
-export default Form.create()(Contact)
+export default Form.create()(drugs)

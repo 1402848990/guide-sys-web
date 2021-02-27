@@ -27,7 +27,7 @@ class Index extends React.Component {
   // 获取课程列表
   getCourseList = async () => {
     const res = await axios({
-      url: 'http://localhost:8088/interface/Stu/courseList',
+      url: 'http://localhost:8088/interface/Patient/courseList',
       method: 'post',
       // data: { id: ID },
     })
@@ -40,7 +40,7 @@ class Index extends React.Component {
   // 删除课程
   del = async (id) => {
     const res = await axios({
-      url: 'http://localhost:8088/interface/Stu/deleteCourse',
+      url: 'http://localhost:8088/interface/Patient/deleteCourse',
       method: 'post',
       data: { id },
     })
@@ -52,7 +52,7 @@ class Index extends React.Component {
   // 添加课程
   handleSubmit = async () => {
     const res = await axios({
-      url: 'http://localhost:8088/interface/Stu/courseAdd',
+      url: 'http://localhost:8088/interface/Patient/courseAdd',
       method: 'post',
       data: { name: this.props.form.getFieldValue('name') },
     })
@@ -90,7 +90,7 @@ class Index extends React.Component {
           +添加
         </Button>
         <Modal
-          title='备忘录'
+          title='标签'
           visible={this.state.visible}
           onOk={this.handleSubmit}
           onCancel={() => {
@@ -98,15 +98,15 @@ class Index extends React.Component {
           }}
         >
           <Form onSubmit={this.handleSubmit}>
-            <Form.Item label='课程名'>
+            <Form.Item label='标签'>
               {getFieldDecorator('name', {
                 rules: [
                   {
                     required: true,
-                    message: '请输入课程名',
+                    message: '请输入标签',
                   },
                 ],
-              })(<Input placeholder='课程名' />)}
+              })(<Input placeholder='标签' />)}
             </Form.Item>
           </Form>
         </Modal>

@@ -292,11 +292,11 @@ export default class UForm extends Component {
   }
 
   clickDetail = (record) => {
-    window.open(`#addStudent?id=${record.stuId}`)
+    window.open(`#addPatient?id=${record.stuId}`)
   }
 
   clickEdit = (record) => {
-    window.open(`#addStudent?edit&id=${record.stuId}`)
+    window.open(`#addPatient?edit&id=${record.stuId}`)
   }
 
   clickDelete = (item) => {

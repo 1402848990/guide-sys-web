@@ -9,8 +9,8 @@ const menuList = [
     icon: 'home',
   },
   {
-    title: '通讯录',
-    path: '/contact',
+    title: '排班设置',
+    path: '/dateManage',
     icon: 'solution',
   },
   {
@@ -24,8 +24,8 @@ const menuList = [
     icon: 'schedule',
   },
   {
-    title: '学生管理',
-    path: '/studentList',
+    title: '患者管理',
+    path: '/patientManage',
     icon: 'team',
   },
   {
@@ -34,14 +34,14 @@ const menuList = [
     icon: 'file-done',
   },
   {
-    title: '奖学金管理',
-    path: '/moneyManage',
-    icon: 'pay-circle',
-  },
-  {
     title: '个人中心',
     path: '/userInfo',
     icon: 'user',
+  },
+  {
+    title: '药品管理-admin',
+    path: '/drugs',
+    icon: 'solution',
   },
 ]
 export default menuList

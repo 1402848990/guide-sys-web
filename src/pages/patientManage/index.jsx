@@ -16,16 +16,14 @@ import {
   Select,
   Card,
 } from 'antd'
-import CourseTag from '../../components/CourseTag'
-import BaseTable from '../../components/BaseTable'
 import ExportExcel from '../../components/ExportExcel'
 
 const Search = Input.Search
 
 const HOST = 'http://localhost:8088/interface'
 
-const tHeader = ['学号', '姓名', '班级', '性别', '职务']
-const filterVal = ['stuId', 'name', 'garde', 'sex', 'level']
+const tHeader = ['患者id', '姓名', '性别', '年龄', '手机号']
+const filterVal = ['patientId', 'patientName', 'sex', 'age', 'phone']
 
 export default class UForm extends Component {
   constructor(props) {
@@ -38,7 +36,7 @@ export default class UForm extends Component {
   }
   // 获取数据
   getData = async () => {
-    const res = await axios.post(`${HOST}/Stu/list`, {
+    const res = await axios.post(`${HOST}/Patient/list`, {
       filter: this.state.filter,
     })
     this.setState(
@@ -93,21 +91,21 @@ export default class UForm extends Component {
   }
 
   clickDetail = (record) => {
-    window.open(`#addStudent?id=${record.stuId}`)
+    window.open(`#addPatient?id=${record.patientId}`)
   }
 
   clickEdit = (record) => {
-    window.open(`#addStudent?edit&id=${record.stuId}`)
+    window.open(`#addPatient?edit&id=${record.patientId}`)
   }
 
   clickDelete = (item) => {
     const _this = this
     Modal.confirm({
-      title: `确定删除学生【${item.name}】吗`,
+      title: `确定删除患者【${item.patientName}】档案吗`,
       content: '',
       async onOk() {
         await axios({
-          url: 'http://localhost:8088/interface/Stu/delete',
+          url: 'http://localhost:8088/interface/Patient/delete',
           method: 'post',
           data: { id: item.id },
         })
@@ -122,26 +120,15 @@ export default class UForm extends Component {
 
   columns = [
     {
-      title: '学号',
-      dataIndex: 'stuId',
+      title: '患者ID',
+      dataIndex: 'patientId',
       width: 80,
       sorter: (a, b) => +a.id - +b.id,
     },
     {
       title: '姓名',
-      dataIndex: 'name',
+      dataIndex: 'patientName',
       width: 180,
-    },
-    {
-      title: '班级',
-      dataIndex: 'garde',
-      width: 180,
-      filters: [
-        { text: '一班', value: '一班' },
-        { text: '二班', value: '二班' },
-        { text: '三班', value: '三班' },
-      ],
-      onFilter: (value, record) => record.garde === value,
     },
     {
       title: '性别',
@@ -157,19 +144,24 @@ export default class UForm extends Component {
       },
     },
     {
-      title: '职务',
-      dataIndex: 'level',
-      width: 150,
+      title: '年龄',
+      dataIndex: 'age',
+      width: 100,
     },
     {
-      title: '创建时间',
+      title: '手机号',
+      dataIndex: 'phone',
+      width: 120,
+    },
+    {
+      title: '档案创建时间',
       dataIndex: 'createdAt',
       sorter: (a, b) => +a.createdAt - +b.createdAt,
       width: 200,
       render: (value) => moment(+value).format('YYYY-MM-DD HH:mm:ss'),
     },
     {
-      title: '更新时间',
+      title: '就诊记录更新时间',
       dataIndex: 'updatedAt',
       sorter: (a, b) => +a.updatedAt - +b.updatedAt,
       width: 200,
@@ -197,9 +189,6 @@ export default class UForm extends Component {
     console.log(filter)
     return (
       <div>
-        <Card title='课程管理'>
-          <CourseTag />
-        </Card>
         <div className='formBody'>
           <Row gutter={16}>
             <Col className='gutter-row' sm={8}>
@@ -207,31 +196,26 @@ export default class UForm extends Component {
               <Search
                 placeholder='请输入姓名'
                 prefix={<Icon type='user' />}
-                value={filter.name}
-                onChange={(e) => this.onChangeUserName(e, 'name')}
+                value={filter.patientName}
+                onChange={(e) => this.onChangeUserName(e, 'patientName')}
               />
             </Col>
             <Col className='gutter-row' sm={8}>
-              <span className='filterTitle'>班级：</span>
-              <Select
-                placeholder='请选择班级'
-                style={{ width: '100%' }}
+              <span className='filterTitle'>患者ID：</span>
+              <Search
+                placeholder='请输入姓名'
                 prefix={<Icon type='user' />}
-                value={filter.garde}
-                onChange={(e) => this.onChangeUserName(e, 'garde')}
-              >
-                <Select.Option value='一班'>一班</Select.Option>
-                <Select.Option value='二班'>二班</Select.Option>
-                <Select.Option value='三班'>三班</Select.Option>
-              </Select>
+                value={filter.patientId}
+                onChange={(e) => this.onChangeUserName(e, 'patientId')}
+              />
             </Col>
             <Col className='gutter-row' sm={8}>
-              <span className='filterTitle'>职务：</span>
+              <span className='filterTitle'>手机号：</span>
               <Search
-                placeholder='请输入职务'
+                placeholder='请输入手机号'
                 prefix={<Icon type='user' />}
-                value={filter.level}
-                onChange={(e) => this.onChangeUserName(e, 'level')}
+                value={filter.phone}
+                onChange={(e) => this.onChangeUserName(e, 'phone')}
               />
             </Col>
           </Row>
@@ -239,11 +223,11 @@ export default class UForm extends Component {
             <Button
               type='primary'
               onClick={() => {
-                window.open('#addStudent')
+                window.open('#addPatient')
               }}
               style={{ marginLeft: '8px' }}
             >
-              添加学生
+              新建患者档案
             </Button>
             <div className='btnOpera'>
               <Button

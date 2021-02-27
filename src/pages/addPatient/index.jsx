@@ -25,6 +25,7 @@ import BaseForm from '../../components/BaseForm'
 import { DATE } from '../../utils/index'
 import ExportExcel from '../../components/ExportExcel'
 import { Line } from '@ant-design/charts'
+import TextArea from 'antd/lib/input/TextArea'
 
 const hash = window.location.hash
 const ID = +hash.split('=')[1]
@@ -74,11 +75,10 @@ class UserInfo extends React.Component {
     !add ? await this.getCourseList() : null
   }
 
-  // 获取学生信息
   getUserInfo = async () => {
     if (ID) {
       const res = await axios({
-        url: 'http://localhost:8088/interface/Stu/detail',
+        url: 'http://localhost:8088/interface/Patient/detail',
         method: 'post',
         data: { id: ID },
       })
@@ -89,138 +89,64 @@ class UserInfo extends React.Component {
     }
   }
 
-  // 获取成绩  课程列表
   getCourseList = async () => {
     const { data } = await axios.post(
-      `http://localhost:8088/interface/Stu/examList`,
+      `http://localhost:8088/interface/Patient/seeDoctorList`,
       {
-        filter: { stuName: this.state.userInfo.name },
+        filter: { patientId: ID },
       }
     )
-    const handledData = data.map((item) => {
-      const content = JSON.parse(item.content)
-      for (let i in content) {
-        item[i] = content[i]
-      }
-      return item
-    })
-    const res = await axios({
-      url: 'http://localhost:8088/interface/Stu/courseList',
-      method: 'post',
-      // data: { id: ID },
-    })
-    this.setState({
-      courseList: res.data,
-    })
     const columns = [
       {
-        label: '学期',
-        field: 'date',
-        name: '学期',
+        label: '病情概况',
+        field: 'content',
+        name: '病情概况',
         required: true,
-        type: 'select',
-        option: DATE,
+      },
+      {
+        label: '治疗方式',
+        field: 'methods',
+        name: '治疗方式',
+        required: true,
+      },
+      {
+        label: '备注',
+        field: 'remark',
+        name: '备注',
+        required: true,
       },
     ]
-    res.data.forEach((item) => {
-      columns.push({
-        label: item.name,
-        field: item.name,
-        name: item.name,
-        required: true,
-      })
-    })
 
     const _examContent = []
-    const courseNameList = []
-
-    res.data.forEach((item) => {
-      courseNameList.push(item.name)
-      _examContent.push({
-        title: item.name,
-        dataIndex: item.name,
-        width: 180,
-        date: item.tate,
-        // render: (_, record) => JSON.parse(record.content)[item.name],
-      })
-    })
 
     this.setState({
       columns,
-      examContent: _examContent,
-      courseList: res.data,
-      courseNameList,
-      examList: handledData,
+      seeList: data,
     })
   }
 
   columns = () => [
     {
-      title: '学号',
-      dataIndex: 'stuId',
-      width: 80,
-      sorter: (a, b) => +a.id - +b.id,
-    },
-    {
-      title: '姓名',
-      dataIndex: 'stuName',
-      width: 180,
-    },
-    {
-      title: '学期',
-      dataIndex: 'date',
-      width: 180,
-    },
-    ...this.state.examContent,
-    {
-      title: '班级',
-      dataIndex: 'garde',
-      width: 180,
-      filters: [
-        { text: '一班', value: '一班' },
-        { text: '二班', value: '二班' },
-        { text: '三班', value: '三班' },
-      ],
-      onFilter: (value, record) => record.garde === value,
-    },
-    {
-      title: '性别',
-      dataIndex: 'stuSex',
-      width: 180,
-      filters: [
-        { text: '男', value: '男' },
-        { text: '女', value: '女' },
-      ],
-      onFilter: (value, record) => record.sex === value,
-    },
-    {
-      title: '创建时间',
+      title: '就诊时间',
       dataIndex: 'createdAt',
       sorter: (a, b) => +a.createdAt - +b.createdAt,
       width: 200,
       render: (value) => moment(+value).format('YYYY-MM-DD HH:mm:ss'),
     },
     {
-      title: '更新时间',
-      dataIndex: 'updatedAt',
-      sorter: (a, b) => +a.updatedAt - +b.updatedAt,
-      width: 200,
-      render: (value) => moment(+value).format('YYYY-MM-DD HH:mm:ss'),
+      title: '病情概况',
+      dataIndex: 'content',
+      width: 180,
     },
     {
-      title: '操作',
-      fixed: 'right',
-      dataIndex: 'action',
-      width: 140,
-      render: (_, record) => (
-        <>
-          <a onClick={() => this.clickDetail(record)}>查看</a>
-          <Divider type='vertical' />
-          <a onClick={() => this.clickEdit(record)}>编辑</a>
-          <Divider type='vertical' />
-          <a onClick={() => this.clickDelete(record)}>删除</a>
-        </>
-      ),
+      title: '治疗方式',
+      dataIndex: 'methods',
+      width: 180,
+    },
+    {
+      title: '备注',
+      dataIndex: 'remark',
+      width: 180,
     },
   ]
 
@@ -229,15 +155,17 @@ class UserInfo extends React.Component {
     console.log(e)
   }
 
+  // 提交
   handleSubmit = () => {
     const { validateFields } = this.props.form
     const edit = hash.includes('edit')
     validateFields(async (err, values) => {
-      values.date = values.date.valueOf()
       console.log('values', values)
       if (!err) {
         const res = await axios({
-          url: `http://localhost:8088/interface/Stu/${edit ? 'update' : 'add'}`,
+          url: `http://localhost:8088/interface/Patient/${
+            edit ? 'update' : 'add'
+          }`,
           method: 'post',
           data: !edit ? values : { ...values, id: ID },
         })
@@ -251,32 +179,25 @@ class UserInfo extends React.Component {
   }
 
   // 添加成绩
-  addExam = () => {
+  addSeeList = () => {
     const {
       validateFields,
-      getFieldsValue,
       resetFields,
     } = this.baseFormRef.current
     const { userInfo } = this.state
     validateFields(async (err, values) => {
       console.log('values', values)
-      const date = values.date
-      delete values.date
       if (!err) {
         const res = await axios({
-          url: `http://localhost:8088/interface/Stu/examAdd`,
+          url: `http://localhost:8088/interface/Patient/addSeeList`,
           method: 'post',
           data: {
-            content: JSON.stringify(values),
-            stuName: userInfo.name,
-            stuSex: userInfo.sex,
-            garde: userInfo.garde,
-            stuId: userInfo.stuId,
-            date,
+           ...values,
+           patientId:ID
           },
         })
         if (res.success) {
-          message.success({ content: '成绩录入成功！' })
+          message.success({ content: '就诊记录添加成功！' })
           this.setState({
             examRes: false,
           })
@@ -291,25 +212,20 @@ class UserInfo extends React.Component {
 
   render() {
     const {
-      userName,
-      reallyName,
-      email,
-      garde,
       phone,
-      passWord,
       createdAt,
       updatedAt,
       sex,
-      id,
-      date,
       address,
-      parentName,
-      parentPhone,
-      name,
-      level,
-      stuId,
-    } = this.state.userInfo||{}
-    const { courseNameList, examList = [] } = this.state
+      allergicHistory,
+      remark,
+      content,
+      age,
+      patientName,
+      userId,
+      patientId,
+    } = this.state.userInfo || {}
+    const { courseNameList, seeList = [] } = this.state
     const tHeader = ['学号', '姓名', '学期', '班级', '性别'].concat(
       courseNameList
     )
@@ -320,18 +236,6 @@ class UserInfo extends React.Component {
       form: { getFieldDecorator, getFieldValue },
     } = this.props
     const charData = []
-    examList.forEach((item) => {
-      Object.entries(item).forEach((ele) => {
-        const [key, value] = ele
-        if (courseNameList.includes(key)) {
-          charData.push({
-            name: key,
-            value: +value,
-            date: item.date,
-          })
-        }
-      })
-    })
     console.log('charData', charData, 'courseNameList', courseNameList)
     const config = {
       data: charData.reverse(),
@@ -356,9 +260,9 @@ class UserInfo extends React.Component {
     }
     return (
       <div className='student'>
-        <Card title='学生信息'>
-          <Avatar shape='square' size={240}>
-            {getFieldValue('name') || '姓名'}
+        <Card title='患者档案'>
+          <Avatar style={{ backgroundColor: '#87d068' }} shape='square' size={240}>
+            {getFieldValue('patientName') || '姓名'}
           </Avatar>
           <Form
             className='form'
@@ -367,28 +271,28 @@ class UserInfo extends React.Component {
           >
             <Row>
               <Col span={11}>
-                <Form.Item label='学号'>
-                  {getFieldDecorator('stuId', {
-                    initialValue: stuId || 101,
+                <Form.Item label='患者ID'>
+                  {getFieldDecorator('patientId', {
+                    initialValue: patientId || 101,
                     rules: [
                       {
                         required: true,
-                        message: '请输入学号',
+                        message: '请输入患者ID',
                       },
                     ],
                   })(
                     <Input
                       className={detail ? 'hideField' : ''}
-                      placeholder='学号'
+                      placeholder='患者ID'
                     />
                   )}
-                  {detail && <span className='stuValue'>{stuId}</span>}
+                  {detail && <span className='stuValue'>{patientId}</span>}
                 </Form.Item>
               </Col>
               <Col span={11}>
                 <Form.Item label='姓名'>
-                  {getFieldDecorator('name', {
-                    initialValue: name || '张三',
+                  {getFieldDecorator('patientName', {
+                    initialValue: patientName || '张三',
                     rules: [
                       {
                         required: true,
@@ -401,7 +305,7 @@ class UserInfo extends React.Component {
                       placeholder='姓名'
                     />
                   )}
-                  {detail && <span className='stuValue'>{name}</span>}
+                  {detail && <span className='stuValue'>{patientName}</span>}
                 </Form.Item>
               </Col>
             </Row>
@@ -430,53 +334,43 @@ class UserInfo extends React.Component {
                 </Form.Item>
               </Col>
               <Col span={11}>
-                <Form.Item label='班级'>
-                  {getFieldDecorator('garde', {
-                    initialValue: garde,
+                <Form.Item label='住址'>
+                  {getFieldDecorator('address', {
+                    initialValue: address,
                     rules: [
                       {
                         required: true,
-                        whitespace: true,
-                        message: '请选择班级',
+                        message: '请输入住址',
                       },
                     ],
                   })(
-                    <Select
+                    <Input
                       className={detail ? 'hideField' : ''}
-                      placeholder='班级'
-                    >
-                      <Select.Option value='一班'>一班</Select.Option>
-                      <Select.Option value='二班'>二班</Select.Option>
-                      <Select.Option value='三班'>三班</Select.Option>
-                    </Select>
+                      placeholder='住址'
+                    />
                   )}{' '}
-                  {detail && <span className='stuValue'>{garde}</span>}
+                  {detail && <span className='stuValue'>{address || '-'}</span>}
                 </Form.Item>
               </Col>
             </Row>
             <Row>
               <Col span={11}>
-                {' '}
-                <Form.Item label='生日'>
-                  {getFieldDecorator('date', {
-                    initialValue: moment(+date),
+                <Form.Item label='年龄'>
+                  {getFieldDecorator('age', {
+                    initialValue: age,
                     rules: [
                       {
                         required: true,
-                        message: '请选择生日',
+                        message: '请输入年龄',
                       },
                     ],
                   })(
-                    <DatePicker
+                    <Input
                       className={detail ? 'hideField' : ''}
-                      style={{ width: '100%' }}
+                      placeholder='年龄'
                     />
                   )}{' '}
-                  {detail && (
-                    <span className='stuValue'>
-                      {moment(+date).format('YYYY-MM-DD')}
-                    </span>
-                  )}
+                  {detail && <span className='stuValue'>{age || '-'}</span>}
                 </Form.Item>
               </Col>
               <Col span={11}>
@@ -502,81 +396,50 @@ class UserInfo extends React.Component {
             <Row>
               <Col span={11}>
                 {' '}
-                <Form.Item label='父母姓名'>
-                  {getFieldDecorator('parentName', {
-                    initialValue: parentName,
+                <Form.Item label='病情概述'>
+                  {getFieldDecorator('content', {
+                    initialValue: content,
                   })(
                     <Input
                       className={detail ? 'hideField' : ''}
-                      placeholder='父母姓名'
+                      placeholder='病情概述'
                     />
                   )}{' '}
-                  {detail && (
-                    <span className='stuValue'>{parentName || '-'}</span>
-                  )}
+                  {detail && <span className='stuValue'>{content || '-'}</span>}
                 </Form.Item>
               </Col>
               <Col span={11}>
-                <Form.Item label='父母手机号'>
-                  {getFieldDecorator('parentPhone', {
-                    initialValue: parentPhone,
+                <Form.Item label='过敏史'>
+                  {getFieldDecorator('allergicHistory', {
+                    initialValue: allergicHistory,
                   })(
                     <Input
                       className={detail ? 'hideField' : ''}
-                      placeholder='父母手机号'
+                      placeholder='过敏史'
                     />
                   )}{' '}
                   {detail && (
-                    <span className='stuValue'>{parentPhone || '-'}</span>
+                    <span className='stuValue'>{allergicHistory || '-'}</span>
                   )}
                 </Form.Item>
               </Col>
             </Row>
             <Row>
               <Col span={11}>
-                <Form.Item label='籍贯'>
-                  {getFieldDecorator('address', {
-                    initialValue: address,
-                    rules: [
-                      {
-                        required: true,
-                        message: '请输入籍贯',
-                      },
-                    ],
+                <Form.Item label='备注'>
+                  {getFieldDecorator('remark', {
+                    initialValue: remark,
                   })(
-                    <Input
+                    <TextArea
+                      autoSize={{ minRows: 6 }}
                       className={detail ? 'hideField' : ''}
-                      placeholder='籍贯'
+                      placeholder='备注'
                     />
                   )}{' '}
-                  {detail && <span className='stuValue'>{address || '-'}</span>}
-                </Form.Item>
-              </Col>
-              <Col span={11}>
-                <Form.Item label='职务'>
-                  {getFieldDecorator('level', {
-                    initialValue: level,
-                  })(
-                    <Input
-                      className={detail ? 'hideField' : ''}
-                      placeholder='职务'
-                    />
-                  )}{' '}
-                  {detail && <span className='stuValue'>{level || '-'}</span>}
+                  {detail && <span className='stuValue'>{remark || '-'}</span>}
                 </Form.Item>
               </Col>
             </Row>
-
-            {/* <Form.Item label='注册时间'>
-            {getFieldDecorator('createdAt', {
-              initialValue: moment(createdAt).format('YYYY-MM-DD HH:mm:ss'),
-            })(<Input disabled />)}
-          </Form.Item>
-          <Form.Item label='更新时间'>
-            {getFieldDecorator('updatedAt', {
-              initialValue: moment(updatedAt).format('YYYY-MM-DD HH:mm:ss'),
-            })(<Input disabled />)}
-          </Form.Item> */}
             {!detail && (
               <Form.Item {...tailFormItemLayout}>
                 <Button
@@ -590,13 +453,12 @@ class UserInfo extends React.Component {
             )}
           </Form>
         </Card>
-        {!add ?
-        (
+        {!add ? (
           <Card
             title={
               <>
-                成绩管理&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <CourseTag />
+                就诊记录&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                {/* <CourseTag /> */}
               </>
             }
             extra={
@@ -605,7 +467,7 @@ class UserInfo extends React.Component {
                   onClick={() => this.setState({ examRes: true })}
                   type='primary'
                 >
-                  录入成绩
+                  添加就诊记录
                 </Button>
               </>
             }
@@ -615,16 +477,16 @@ class UserInfo extends React.Component {
               tHeader={tHeader}
               filterVal={filterVal}
               columns={this.columns()}
-              data={examList}
+              data={seeList}
             />
           </Card>
-        ):null}
+        ) : null}
 
         {/* 录入成绩modal */}
         <Modal
-          title='录入成绩'
+          title='就诊记录'
           visible={this.state.examRes}
-          onOk={this.addExam}
+          onOk={this.addSeeList}
           onCancel={() => {
             this.setState({ examRes: false })
           }}
