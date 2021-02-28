@@ -501,7 +501,7 @@ class UserInfo extends React.Component {
               data={seeList}
             />
           </Card>
-        ) : null}å
+        ) : null}
         <Modal
           title='就诊记录'
           visible={this.state.examRes}
