@@ -26,6 +26,7 @@ import { DATE } from '../../utils/index'
 import ExportExcel from '../../components/ExportExcel'
 import { Line } from '@ant-design/charts'
 import TextArea from 'antd/lib/input/TextArea'
+import { useRouteMatch } from 'react-router-dom/cjs/react-router-dom.min'
 
 const hash = window.location.hash
 const ID = +hash.split('=')[1]
@@ -96,6 +97,14 @@ class UserInfo extends React.Component {
         filter: { patientId: ID },
       }
     )
+    const { data: list } = await axios.post(
+      `http://localhost:8088/interface/Drugs/drugsList`
+    )
+    const dList = list.map((item) => (
+      <Select.Option disabled={item.num <= 0} value={item.name} key={item.name}>
+        {item.name}_{item.factory}_{item.num}
+      </Select.Option>
+    ))
     const columns = [
       {
         label: '病情概况',
@@ -110,14 +119,21 @@ class UserInfo extends React.Component {
         required: true,
       },
       {
+        label: '所用药品',
+        field: 'drugs',
+        name: '药品',
+        required: true,
+        type: 'select',
+        render: dList,
+        mode: 'multiple',
+      },
+      {
         label: '备注',
         field: 'remark',
         name: '备注',
         required: true,
       },
     ]
-
-    const _examContent = []
 
     this.setState({
       columns,
@@ -130,18 +146,23 @@ class UserInfo extends React.Component {
       title: '就诊时间',
       dataIndex: 'createdAt',
       sorter: (a, b) => +a.createdAt - +b.createdAt,
-      width: 200,
+      width: 220,
       render: (value) => moment(+value).format('YYYY-MM-DD HH:mm:ss'),
     },
     {
       title: '病情概况',
       dataIndex: 'content',
-      width: 180,
+      width: 240,
     },
     {
       title: '治疗方式',
       dataIndex: 'methods',
-      width: 180,
+      width: 240,
+    },
+    {
+      title: '用药列表',
+      dataIndex: 'drugs',
+      // width: 240,
     },
     {
       title: '备注',
@@ -178,12 +199,8 @@ class UserInfo extends React.Component {
     })
   }
 
-  // 添加成绩
   addSeeList = () => {
-    const {
-      validateFields,
-      resetFields,
-    } = this.baseFormRef.current
+    const { validateFields, resetFields } = this.baseFormRef.current
     const { userInfo } = this.state
     validateFields(async (err, values) => {
       console.log('values', values)
@@ -192,8 +209,8 @@ class UserInfo extends React.Component {
           url: `http://localhost:8088/interface/Patient/addSeeList`,
           method: 'post',
           data: {
-           ...values,
-           patientId:ID
+            ...values,
+            patientId: ID,
           },
         })
         if (res.success) {
@@ -226,10 +243,10 @@ class UserInfo extends React.Component {
       patientId,
     } = this.state.userInfo || {}
     const { courseNameList, seeList = [] } = this.state
-    const tHeader = ['学号', '姓名', '学期', '班级', '性别'].concat(
+    const tHeader = ['病情概况', '治疗方式', '用药列表', '备注'].concat(
       courseNameList
     )
-    const filterVal = ['stuId', 'stuName', 'date', 'garde', 'stuSex'].concat(
+    const filterVal = ['content', 'methods', 'drugs', 'remark'].concat(
       courseNameList
     )
     const {
@@ -261,7 +278,11 @@ class UserInfo extends React.Component {
     return (
       <div className='student'>
         <Card title='患者档案'>
-          <Avatar style={{ backgroundColor: '#87d068' }} shape='square' size={240}>
+          <Avatar
+            style={{ backgroundColor: '#87d068' }}
+            shape='square'
+            size={240}
+          >
             {getFieldValue('patientName') || '姓名'}
           </Avatar>
           <Form
@@ -480,9 +501,7 @@ class UserInfo extends React.Component {
               data={seeList}
             />
           </Card>
-        ) : null}
-
-        {/* 录入成绩modal */}
+        ) : null}å
         <Modal
           title='就诊记录'
           visible={this.state.examRes}
@@ -493,11 +512,6 @@ class UserInfo extends React.Component {
         >
           <BaseForm ref={this.baseFormRef} columns={this.state.columns} />
         </Modal>
-        {!add && (
-          <Card title='各科成绩分析图表' className='stuChar'>
-            <Line {...config} />
-          </Card>
-        )}
       </div>
     )
   }

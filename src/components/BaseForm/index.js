@@ -27,8 +27,8 @@ class Index extends React.Component {
               placeholder={item.label}
             />
           ) : item.type === 'select' ? (
-            <Select style={{width:'100%'}}>
-              {item.option.map((item) => (
+            <Select mode={item.mode} style={{width:'100%'}}>
+              {item.render?item.render:item.option.map((item) => (
                 <Select.Option key={item.value} key={item.value}>
                   {item.label}
                 </Select.Option>

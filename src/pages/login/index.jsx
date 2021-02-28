@@ -46,7 +46,7 @@ const Login = (props) => {
           })
           message.success({content:'登录成功！'})
           setTimeout(() => {
-            window.location.href = '/dashboard'
+            window.location.href = '/#newsManage'
           }, 1000);
           console.log('cookie',Cookie.get('userInfo'))
         } else {
