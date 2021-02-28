@@ -45,9 +45,6 @@ const LayoutHeader = (props) => {
   }
   const menu = (
     <Menu onClick={onClick}>
-      <Menu.Item key='dashboard'>
-        <Link to='/dashboard'>首页</Link>
-      </Menu.Item>
       <Menu.Divider />
       <Menu.Item key='logout'>退出</Menu.Item>
     </Menu>

@@ -17,7 +17,7 @@ import axios from '../../request/axiosConfig'
 import api from '../../request/api/api_user'
 import styles from './index.less'
 import moment from 'moment'
-import { Department, Level } from '../../utils/enum'
+import { Department, Work } from '../../utils/enum'
 
 // 科室选项
 const DepartmentOpt = Department.map((item) => (
@@ -26,7 +26,7 @@ const DepartmentOpt = Department.map((item) => (
   </Select.Option>
 ))
 // 职称选项
-const LevelOpt = Level.map((item) => (
+const WorkOpt = Work.map((item) => (
   <Select.Option key={item} value={item}>
     {item}
   </Select.Option>
@@ -73,6 +73,7 @@ class UserInfo extends React.Component {
     const res = await axios({
       url: 'http://localhost:8088/interface/User/getUserInfo',
       method: 'post',
+      data:{from:'pentient'}
     })
     this.setState({
       userInfo: res.info,
@@ -96,7 +97,7 @@ class UserInfo extends React.Component {
         const res = await axios({
           url: 'http://localhost:8088/interface/User/editUserInfo',
           method: 'post',
-          data: { changeData: values },
+          data: { changeData: values,from:'pentient' },
         })
         if (res.success) {
           message.success({ content: '信息修改成功！' })
@@ -122,7 +123,7 @@ class UserInfo extends React.Component {
       age,
       address,
       department,
-      level,
+      work,
     } = this.state.userInfo
     const {
       form: { getFieldDecorator },
@@ -183,29 +184,18 @@ class UserInfo extends React.Component {
               })(<Input placeholder='住址' />)}
             </Form.Item>
           </Card>
-          <Card title='职能信息' bordered={false} style={{}}>
-            <Form.Item label='科室'>
-              {getFieldDecorator('department', {
-                initialValue: department,
-                rules: [
-                  {
-                    required: true,
-                    message: '请选择科室',
-                  },
-                ],
-              })(<Select placeholder='科室'>{DepartmentOpt}</Select>)}
-            </Form.Item>
-            <Form.Item label='职级'>
-              {getFieldDecorator('level', {
-                initialValue: level,
+          <Card title='职业信息' bordered={false} style={{}}>
+            <Form.Item label='职业'>
+              {getFieldDecorator('work', {
+                initialValue: work,
                 rules: [
                   {
                     required: true,
                     whitespace: true,
-                    message: '请输入职级',
+                    message: '请输入职业',
                   },
                 ],
-              })(<Select placeholder='职级'>{LevelOpt}</Select>)}
+              })(<Select placeholder='职业'>{WorkOpt}</Select>)}
             </Form.Item>
           </Card>
           <Card title='账号信息' bordered={false} style={{}}>

@@ -14,9 +14,14 @@ import {
   Modal,
   message,
   Select,
+  List,
+  Card,
+  Tag,
 } from 'antd'
 
 import BaseTable from '../../components/BaseTable'
+
+const { Meta } = Card
 
 const Search = Input.Search
 
@@ -35,6 +40,7 @@ export default class UForm extends Component {
   getData = async () => {
     const res = await axios.post(`${HOST}/User/newsList`, {
       filter: this.state.filter,
+      from: 'pentient',
     })
     this.setState(
       {
@@ -136,7 +142,9 @@ export default class UForm extends Component {
       title: '推荐指数',
       dataIndex: 'level',
       width: 150,
-      render: (value) => <Rate  character={<Icon type='heart' />} disabled value={value} />,
+      render: (value) => (
+        <Rate character={<Icon type='heart' />} disabled value={value} />
+      ),
     },
     {
       title: '发布时间',
@@ -200,15 +208,6 @@ export default class UForm extends Component {
             </Col>
           </Row>
           <Row gutter={16}>
-            <Button
-              type='primary'
-              onClick={() => {
-                window.open('#baseNews')
-              }}
-              style={{ marginLeft: '8px' }}
-            >
-              发布资讯
-            </Button>
             <div className='btnOpera'>
               <Button
                 type='primary'
@@ -230,13 +229,63 @@ export default class UForm extends Component {
               </Button>
             </div>
           </Row>
-          <BaseTable
-            columns={this.columns}
+                <br/>
+          <List
+            grid={{
+              gutter: 16,
+              xs: 1,
+              sm: 2,
+              md: 4,
+              lg: 4,
+              xl: 6,
+              xxl: 3,
+            }}
+            className='demo-loadmore-list'
+            // loading={initLoading}
+            itemLayout='horizontal'
+            pagination={{
+              pageSize: 10,
+            }}
             dataSource={dataSource}
-            checkChange={this.checkChange}
-            onDelete={this.onDelete}
-            editClick={this.editClick}
-            loading={loading}
+            renderItem={(item) => (
+              <List.Item>
+                <Card
+                  className='noteCard'
+                  hoverable
+                  actions={[<span onClick={() => this.clickDetail(item)}>查看详情</span>]}
+                  title={
+                    <>
+                      {item.title}
+                      <Rate
+                        style={{ float: 'right' }}
+                        character={<Icon type='heart' />}
+                        value={item.level}
+                        disabled
+                      />
+                    </>
+                  }
+                >
+                  {/* <div style={{ marginBottom: '10px' }}>
+                    所属板块：<Tag color='#87d068'>{item.section}</Tag>
+                  </div> */}
+                  <div style={{ marginBottom: '10px' }}>
+                    发布人：{item.userName}
+                  </div>
+                  <div style={{ marginBottom: '10px' }}>
+                    发布时间：
+                    {moment(+item.createdAt).format('YYYY-MM-DD HH:mm:ss')}
+                  </div>
+                  <div style={{ marginBottom: '10px' }}>
+                    更新时间：
+                    {moment(+item.updatedAt).format('YYYY-MM-DD HH:mm:ss')}
+                  </div>
+                  <Meta
+                    className='meta'
+                    description={<Tag style={{ marginTop: '10px' }} color='#87d068'>{item.section}</Tag>}
+                  />
+                </Card>
+              </List.Item>
+            )}
           />
         </div>
       </div>

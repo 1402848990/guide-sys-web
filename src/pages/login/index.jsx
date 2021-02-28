@@ -4,17 +4,16 @@ import { Form, Icon, Input, Button, message, Spin, Tabs, Select } from 'antd'
 import DocumentTitle from 'react-document-title'
 import axios from '../../request/axiosConfig'
 import api from '../../request/api/api_user'
-import request from 'axios'
 import Cookie from 'js-cookie'
 import { browserHistory } from 'react-router'
-import {Department,Level} from '../../utils/enum'
+import {Department,Work} from '../../utils/enum'
 import './index.less'
 
 const { TabPane } = Tabs
 // 科室选项
 const DepartmentOpt = Department.map(item=><Select.Option key={item} value={item}>{item}</Select.Option>)
 // 职称选项
-const LevelOpt = Level.map(item=><Select.Option key={item} value={item}>{item}</Select.Option>)
+const WorkOpt = Work.map(item=><Select.Option key={item} value={item}>{item}</Select.Option>)
 
 const Login = (props) => {
   const { form, token, login, getUserInfo } = props
@@ -37,7 +36,7 @@ const Login = (props) => {
           const res = await axios({
             url: 'http://localhost:8088/interface/User/userLogin',
             method: 'post',
-            data: values,
+            data: {...values,from:'patient'},
           })
           console.log('res', res)
           const { userInfo } = res
@@ -46,14 +45,14 @@ const Login = (props) => {
           })
           message.success({content:'登录成功！'})
           setTimeout(() => {
-            window.location.href = '/dashboard'
+            window.location.href = '/#userInfo'
           }, 1000);
           console.log('cookie',Cookie.get('userInfo'))
         } else {
           const res = await axios({
             url: api.registerUser,
             method: 'post',
-            data: values,
+            data: {...values,from:'pentient'},
           })
           if(res.success){
             message.success({content:'恭喜您~账户创建成功！'})
@@ -68,7 +67,7 @@ const Login = (props) => {
     return <Redirect to='/dashboard' />
   }
   return (
-    <DocumentTitle title={'医生登录'}>
+    <DocumentTitle title={'用户登录'}>
       <div className='login-container'>
         <div className='content'>
           <Spin spinning={loading} tip='登录中...'>
@@ -77,7 +76,7 @@ const Login = (props) => {
               defaultActiveKey='1'
               onChange={(e) => setKey(e)}
             >
-              <TabPane tab='医生登录' key='1'>
+              <TabPane tab='用户登录' key='1'>
                 <Form onSubmit={handleSubmit}>
                   <Form.Item>
                     {getFieldDecorator('phone', {
@@ -88,7 +87,7 @@ const Login = (props) => {
                           message: '请输入手机号',
                         },
                       ],
-                      initialValue: '15555555555', // 初始值
+                      initialValue: '16666666666', // 初始值
                     })(
                       <Input
                         prefix={
@@ -136,30 +135,8 @@ const Login = (props) => {
                 </Form>
               </TabPane>
               {/* 注册模块 */}
-              <TabPane tab='医生注册' key='2'>
+              <TabPane tab='用户注册' key='2'>
                 <Form onSubmit={handleSubmit}>
-                  {/* <Form.Item>
-                    {getFieldDecorator('userName', {
-                      rules: [
-                        {
-                          required: key === '2',
-                          whitespace: true,
-                          message: '请输入用户名',
-                        },
-                      ],
-                    })(
-                      <Input
-                        prefix={
-                          <Icon
-                            type='user'
-                            style={{ color: 'rgba(0,0,0,.25)' }}
-                          />
-                        }
-                        placeholder='用户名'
-                      />
-                    )}
-                  </Form.Item> */}
-                  
                   <Form.Item>
                     {getFieldDecorator('userName', {
                       rules: [
@@ -280,36 +257,19 @@ const Login = (props) => {
                     )}
                   </Form.Item>
                   <Form.Item>
-                    {getFieldDecorator('department', {
+                    {getFieldDecorator('work', {
                       rules: [
                         {
                           required: key === '2',
                           whitespace: true,
-                          message: '请选择科室',
-                        },
-                      ],
-                    })(
-                      <Select placeholder='科室'>
-                        {
-                          DepartmentOpt
-                        }
-                      </Select>
-                    )}
-                  </Form.Item>
-                  <Form.Item>
-                    {getFieldDecorator('level', {
-                      rules: [
-                        {
-                          required: key === '2',
-                          whitespace: true,
-                          message: '请选择职级',
+                          message: '请选择职业',
                         },
                       ],
                     })(
                       <Select 
-                      placeholder='职级'>
+                      placeholder='职业'>
                         {
-                          LevelOpt
+                          WorkOpt
                         }
                       </Select>
                     )}

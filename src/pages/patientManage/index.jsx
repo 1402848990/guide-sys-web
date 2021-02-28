@@ -16,14 +16,15 @@ import {
   Select,
   Card,
 } from 'antd'
+import Cookie from 'js-cookie'
 import ExportExcel from '../../components/ExportExcel'
 
 const Search = Input.Search
 
 const HOST = 'http://localhost:8088/interface'
 
-const tHeader = ['患者id', '姓名', '性别', '年龄', '手机号']
-const filterVal = ['patientId', 'patientName', 'sex', 'age', 'phone']
+const tHeader = ['日期', '科室', '医生姓名', '医生职称', '手机号医生性别']
+const filterVal = ['date', 'doctorInfo.department', 'doctorInfo.userName', 'doctorInfo.level', 'doctorInfo.department']
 
 export default class UForm extends Component {
   constructor(props) {
@@ -34,21 +35,40 @@ export default class UForm extends Component {
       loading: true,
     }
   }
-  // 获取数据
+
+  // 获取挂号记录
   getData = async () => {
-    const res = await axios.post(`${HOST}/Patient/list`, {
-      filter: this.state.filter,
-    })
-    this.setState(
-      {
-        dataSource: res.data,
+    const cookie = JSON.parse(Cookie.get('userInfo'))
+    console.log('cookie', cookie)
+    const { doctor } = this.state
+    const res = await axios({
+      url: 'http://localhost:8088/interface/User/dateList',
+      method: 'post',
+      data: {
+        filter: {},
+        from: 'patient',
       },
-      () => {
-        this.setState({
-          loading: false,
-        })
-      }
-    )
+    })
+    const arr = res.data.filter((item) => {
+      const { patientInfo } = item
+      item.doctorInfo = JSON.parse(item.doctorInfo)
+      item.patientInfo = patientInfo ? JSON.parse(patientInfo) : []
+      let has = false
+
+      item.patientInfo.forEach((ele = {}) => {
+        console.log('ele', ele)
+        if (ele.id == cookie.id) {
+          has = true
+        }
+      })
+      console.log('has', has, '')
+
+      return has
+    })
+    this.setState({
+      dataSource: arr,
+      loading: false,
+    })
   }
   //姓名输入
   onChangeUserName = (e, field) => {
@@ -120,20 +140,29 @@ export default class UForm extends Component {
 
   columns = [
     {
-      title: '患者ID',
-      dataIndex: 'patientId',
+      title: '日期',
+      dataIndex: 'date',
+      width: 120,
+    },
+    {
+      title: '科室',
+      dataIndex: 'doctorInfo.department',
+      width: 120,
+    },
+    {
+      title: '医生姓名',
+      dataIndex: 'doctorInfo.userName',
+      width: 100,
+    },
+    {
+      title: '医生职称',
+      dataIndex: 'doctorInfo.level',
+      width: 120,
+    },
+    {
+      title: '医生性别',
+      dataIndex: 'doctorInfo.sex',
       width: 80,
-      sorter: (a, b) => +a.id - +b.id,
-    },
-    {
-      title: '姓名',
-      dataIndex: 'patientName',
-      width: 180,
-    },
-    {
-      title: '性别',
-      dataIndex: 'sex',
-      width: 180,
       filters: [
         { text: '男', value: '男' },
         { text: '女', value: '女' },
@@ -142,57 +171,34 @@ export default class UForm extends Component {
         console.log('record.sex', record.sex, 'value', value)
         return record.sex === value
       },
+      render: (text) => (text === 1 ? '男' : '女'),
     },
-    {
-      title: '年龄',
-      dataIndex: 'age',
-      width: 100,
-    },
-    {
-      title: '手机号',
-      dataIndex: 'phone',
-      width: 120,
-    },
-    {
-      title: '档案创建时间',
-      dataIndex: 'createdAt',
-      sorter: (a, b) => +a.createdAt - +b.createdAt,
-      width: 200,
-      render: (value) => moment(+value).format('YYYY-MM-DD HH:mm:ss'),
-    },
-    {
-      title: '就诊记录更新时间',
-      dataIndex: 'updatedAt',
-      sorter: (a, b) => +a.updatedAt - +b.updatedAt,
-      width: 200,
-      render: (value) => moment(+value).format('YYYY-MM-DD HH:mm:ss'),
-    },
-    {
-      title: '操作',
-      fixed: 'right',
-      dataIndex: 'action',
-      width: 140,
-      render: (_, record) => (
-        <>
-          <a onClick={() => this.clickDetail(record)}>查看</a>
-          <Divider type='vertical' />
-          <a onClick={() => this.clickEdit(record)}>编辑</a>
-          <Divider type='vertical' />
-          <a onClick={() => this.clickDelete(record)}>删除</a>
-        </>
-      ),
-    },
+    // {
+    //   title: '操作',
+    //   fixed: 'right',
+    //   dataIndex: 'action',
+    //   width: 140,
+    //   render: (_, record) => (
+    //     <>
+    //       <a onClick={() => this.clickDetail(record)}>查看</a>
+    //       <Divider type='vertical' />
+    //       <a onClick={() => this.clickEdit(record)}>编辑</a>
+    //       <Divider type='vertical' />
+    //       <a onClick={() => this.clickDelete(record)}>删除</a>
+    //     </>
+    //   ),
+    // },
   ]
 
   render() {
     const { filter, dataSource, loading } = this.state
-    console.log(filter)
+    console.log(filter, dataSource)
     return (
       <div>
         <div className='formBody'>
-          <Row gutter={16}>
+          {/* <Row gutter={16}>
             <Col className='gutter-row' sm={8}>
-              <span className='filterTitle'>姓名：</span>
+              <span className='filterTitle'>医生姓名：</span>
               <Search
                 placeholder='请输入姓名'
                 prefix={<Icon type='user' />}
@@ -201,7 +207,7 @@ export default class UForm extends Component {
               />
             </Col>
             <Col className='gutter-row' sm={8}>
-              <span className='filterTitle'>患者ID：</span>
+              <span className='filterTitle'>科室：</span>
               <Search
                 placeholder='请输入姓名'
                 prefix={<Icon type='user' />}
@@ -209,27 +215,18 @@ export default class UForm extends Component {
                 onChange={(e) => this.onChangeUserName(e, 'patientId')}
               />
             </Col>
-            <Col className='gutter-row' sm={8}>
-              <span className='filterTitle'>手机号：</span>
-              <Search
-                placeholder='请输入手机号'
-                prefix={<Icon type='user' />}
-                value={filter.phone}
-                onChange={(e) => this.onChangeUserName(e, 'phone')}
-              />
-            </Col>
-          </Row>
+          </Row> */}
           <Row gutter={16}>
             <Button
               type='primary'
               onClick={() => {
-                window.open('#addPatient')
+                window.open('#dateManage')
               }}
               style={{ marginLeft: '8px' }}
             >
-              新建患者档案
+              去挂号
             </Button>
-            <div className='btnOpera'>
+            {/* <div className='btnOpera'>
               <Button
                 type='primary'
                 onClick={this.btnSearch_Click}
@@ -248,16 +245,8 @@ export default class UForm extends Component {
               >
                 重置
               </Button>
-            </div>
+            </div> */}
           </Row>
-          {/* <BaseTable
-            columns={this.columns}
-            dataSource={dataSource}
-            checkChange={this.checkChange}
-            onDelete={this.onDelete}
-            editClick={this.editClick}
-            loading={loading}
-          /> */}
           <ExportExcel
             loading={loading}
             tHeader={tHeader}
