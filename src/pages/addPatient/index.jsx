@@ -20,7 +20,6 @@ import {
 import axios from '../../request/axiosConfig'
 import styles from './index.less'
 import moment from 'moment'
-import CourseTag from '../../components/CourseTag'
 import BaseForm from '../../components/BaseForm'
 import { DATE } from '../../utils/index'
 import ExportExcel from '../../components/ExportExcel'
@@ -479,7 +478,6 @@ class UserInfo extends React.Component {
             title={
               <>
                 就诊记录&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                {/* <CourseTag /> */}
               </>
             }
             extra={
