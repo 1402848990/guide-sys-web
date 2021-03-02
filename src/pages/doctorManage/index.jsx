@@ -16,15 +16,15 @@ import {
   Select,
   Card,
 } from 'antd'
-import { Work } from '../../utils/enum'
+import { Department, Level } from '../../utils/enum'
 import ExportExcel from '../../components/ExportExcel'
 
 const Search = Input.Search
 
 const HOST = 'http://localhost:8088/interface'
 
-const tHeader = ['id', '姓名', '性别', '年龄', '手机号', '职业']
-const filterVal = ['id', 'userName', 'sex', 'age', 'phone', 'work']
+const tHeader = ['id', '姓名', '性别', '年龄', '手机号', '部门']
+const filterVal = ['id', 'userName', 'sex', 'age', 'phone', 'department']
 
 export default class UForm extends Component {
   constructor(props) {
@@ -135,7 +135,7 @@ export default class UForm extends Component {
     {
       title: '性别',
       dataIndex: 'sex',
-      width: 180,
+      width: 100,
       filters: [
         { text: '男', value: 1 },
         { text: '女', value: 2 },
@@ -152,8 +152,13 @@ export default class UForm extends Component {
       width: 100,
     },
     {
-      title: '职业',
-      dataIndex: 'work',
+      title: '职级',
+      dataIndex: 'level',
+      width: 120,
+    },
+    {
+      title: '部门',
+      dataIndex: 'department',
       width: 120,
     },
     {
@@ -203,23 +208,30 @@ export default class UForm extends Component {
           </Row>
           <Row>
             <Col className='gutter-row' sm={8}>
-              <span className='filterTitle'>职业：</span>
+              <span className='filterTitle'>部门：</span>
               <Select
-                onChange={(e) => this.onChangeUserName(e, 'work')}
+                onChange={(e) => this.onChangeUserName(e, 'department')}
                 style={{ width: '100%' }}
               >
-                {Work.map((item) => (
+                {Department.map((item) => (
                   <Select.Option key={item} value={item}>
                     {item}
                   </Select.Option>
                 ))}
               </Select>
-              {/* <Search
-                placeholder='请输入手机号'
-                prefix={<Icon type='user' />}
-                value={filter.phone}
-                onChange={(e) => this.onChangeUserName(e, 'phone')}
-              /> */}
+            </Col>
+            <Col className='gutter-row' sm={8}>
+              <span className='filterTitle'>职级：</span>
+              <Select
+                onChange={(e) => this.onChangeUserName(e, 'level')}
+                style={{ width: '100%' }}
+              >
+                {Level.map((item) => (
+                  <Select.Option key={item} value={item}>
+                    {item}
+                  </Select.Option>
+                ))}
+              </Select>
             </Col>
           </Row>
           <Row gutter={16}>
