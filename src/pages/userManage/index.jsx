@@ -16,14 +16,15 @@ import {
   Select,
   Card,
 } from 'antd'
+import { Work } from '../../utils/enum'
 import ExportExcel from '../../components/ExportExcel'
 
 const Search = Input.Search
 
 const HOST = 'http://localhost:8088/interface'
 
-const tHeader = ['患者id', '姓名', '性别', '年龄', '手机号']
-const filterVal = ['patientId', 'patientName', 'sex', 'age', 'phone']
+const tHeader = ['id', '姓名', '性别', '年龄', '手机号', '职业']
+const filterVal = ['id', 'userName', 'sex', 'age', 'phone', 'work']
 
 export default class UForm extends Component {
   constructor(props) {
@@ -36,9 +37,9 @@ export default class UForm extends Component {
   }
   // 获取数据
   getData = async () => {
-    const res = await axios.post(`${HOST}/Patient/list`, {
+    const res = await axios.post(`${HOST}/Patient/userList`, {
       filter: this.state.filter,
-      from:'admin'
+      from: 'admin',
     })
     this.setState(
       {
@@ -102,7 +103,7 @@ export default class UForm extends Component {
   clickDelete = (item) => {
     const _this = this
     Modal.confirm({
-      title: `确定删除患者【${item.patientName}】档案吗`,
+      title: `确定删除患者【${item.userName}】档案吗`,
       content: '',
       async onOk() {
         await axios({
@@ -121,14 +122,14 @@ export default class UForm extends Component {
 
   columns = [
     {
-      title: '患者ID',
-      dataIndex: 'patientId',
+      title: '用户ID',
+      dataIndex: 'id',
       width: 80,
       sorter: (a, b) => +a.id - +b.id,
     },
     {
       title: '姓名',
-      dataIndex: 'patientName',
+      dataIndex: 'userName',
       width: 180,
     },
     {
@@ -136,13 +137,14 @@ export default class UForm extends Component {
       dataIndex: 'sex',
       width: 180,
       filters: [
-        { text: '男', value: '男' },
-        { text: '女', value: '女' },
+        { text: '男', value: 1 },
+        { text: '女', value: 2 },
       ],
       onFilter: (value, record) => {
         console.log('record.sex', record.sex, 'value', value)
         return record.sex === value
       },
+      render: (text) => (text === 1 ? '男' : '女'),
     },
     {
       title: '年龄',
@@ -150,36 +152,26 @@ export default class UForm extends Component {
       width: 100,
     },
     {
+      title: '职业',
+      dataIndex: 'work',
+      width: 120,
+    },
+    {
       title: '手机号',
       dataIndex: 'phone',
       width: 120,
     },
     {
-      title: '档案创建时间',
+      title: '住址',
+      dataIndex: 'address',
+      width: 120,
+    },
+    {
+      title: '注册时间',
       dataIndex: 'createdAt',
       sorter: (a, b) => +a.createdAt - +b.createdAt,
       width: 200,
       render: (value) => moment(+value).format('YYYY-MM-DD HH:mm:ss'),
-    },
-    {
-      title: '就诊记录更新时间',
-      dataIndex: 'updatedAt',
-      sorter: (a, b) => +a.updatedAt - +b.updatedAt,
-      width: 200,
-      render: (value) => moment(+value).format('YYYY-MM-DD HH:mm:ss'),
-    },
-    {
-      title: '操作',
-      fixed: 'right',
-      dataIndex: 'action',
-      width: 140,
-      render: (_, record) => (
-        <>
-          <a onClick={() => this.clickDetail(record)}>查看</a>
-          <Divider type='vertical' />
-          <a onClick={() => this.clickDelete(record)}>删除</a>
-        </>
-      ),
     },
   ]
 
@@ -195,27 +187,39 @@ export default class UForm extends Component {
               <Search
                 placeholder='请输入姓名'
                 prefix={<Icon type='user' />}
-                value={filter.patientName}
-                onChange={(e) => this.onChangeUserName(e, 'patientName')}
+                value={filter.userName}
+                onChange={(e) => this.onChangeUserName(e, 'userName')}
               />
             </Col>
             <Col className='gutter-row' sm={8}>
-              <span className='filterTitle'>患者ID：</span>
+              <span className='filterTitle'>住址：</span>
               <Search
-                placeholder='请输入姓名'
+                placeholder='住址'
                 prefix={<Icon type='user' />}
-                value={filter.patientId}
-                onChange={(e) => this.onChangeUserName(e, 'patientId')}
+                value={filter.address}
+                onChange={(e) => this.onChangeUserName(e, 'address')}
               />
             </Col>
+          </Row>
+          <Row>
             <Col className='gutter-row' sm={8}>
-              <span className='filterTitle'>手机号：</span>
-              <Search
+              <span className='filterTitle'>职业：</span>
+              <Select
+                onChange={(e) => this.onChangeUserName(e, 'work')}
+                style={{ width: '100%' }}
+              >
+                {Work.map((item) => (
+                  <Select.Option key={item} value={item}>
+                    {item}
+                  </Select.Option>
+                ))}
+              </Select>
+              {/* <Search
                 placeholder='请输入手机号'
                 prefix={<Icon type='user' />}
                 value={filter.phone}
                 onChange={(e) => this.onChangeUserName(e, 'phone')}
-              />
+              /> */}
             </Col>
           </Row>
           <Row gutter={16}>

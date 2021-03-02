@@ -14,13 +14,17 @@ import {
   Modal,
   message,
   Select,
+  Card,
 } from 'antd'
-
-import BaseTable from '../../components/BaseTable'
+import { Work } from '../../utils/enum'
+import ExportExcel from '../../components/ExportExcel'
 
 const Search = Input.Search
 
 const HOST = 'http://localhost:8088/interface'
+
+const tHeader = ['id', '姓名', '性别', '年龄', '手机号', '职业']
+const filterVal = ['id', 'userName', 'sex', 'age', 'phone', 'work']
 
 export default class UForm extends Component {
   constructor(props) {
@@ -33,8 +37,9 @@ export default class UForm extends Component {
   }
   // 获取数据
   getData = async () => {
-    const res = await axios.post(`${HOST}/User/newsList`, {
+    const res = await axios.post(`${HOST}/User/doctorList`, {
       filter: this.state.filter,
+      from: 'admin',
     })
     this.setState(
       {
@@ -51,7 +56,7 @@ export default class UForm extends Component {
   onChangeUserName = (e, field) => {
     console.log(e)
     if (e) {
-      const value = !isNaN(+e) ? e : e?.target?.value
+      const value = !e?.target ? e : e?.target?.value
       const _filter = this.state.filter
       this.setState({
         filter: {
@@ -88,21 +93,21 @@ export default class UForm extends Component {
   }
 
   clickDetail = (record) => {
-    window.open(`#baseNews?id=${record.id}`)
+    window.open(`#addPatient?id=${record.patientId}`)
   }
 
   clickEdit = (record) => {
-    window.open(`#baseNews?id=${record.id}&edit`)
+    window.open(`#addPatient?edit&id=${record.patientId}`)
   }
 
   clickDelete = (item) => {
     const _this = this
     Modal.confirm({
-      title: `确定删除这条资讯吗`,
+      title: `确定删除患者【${item.userName}】档案吗`,
       content: '',
       async onOk() {
         await axios({
-          url: 'http://localhost:8088/interface/User/deletePlan',
+          url: 'http://localhost:8088/interface/Patient/delete',
           method: 'post',
           data: { id: item.id },
         })
@@ -117,54 +122,56 @@ export default class UForm extends Component {
 
   columns = [
     {
-      title: 'ID',
+      title: '用户ID',
       dataIndex: 'id',
       width: 80,
       sorter: (a, b) => +a.id - +b.id,
     },
     {
-      title: '资讯标题',
-      dataIndex: 'title',
+      title: '姓名',
+      dataIndex: 'userName',
       width: 180,
     },
     {
-      title: '所属版块',
-      dataIndex: 'section',
+      title: '性别',
+      dataIndex: 'sex',
       width: 180,
+      filters: [
+        { text: '男', value: 1 },
+        { text: '女', value: 2 },
+      ],
+      onFilter: (value, record) => {
+        console.log('record.sex', record.sex, 'value', value)
+        return record.sex === value
+      },
+      render: (text) => (text === 1 ? '男' : '女'),
     },
     {
-      title: '推荐指数',
-      dataIndex: 'level',
-      width: 150,
-      render: (value) => <Rate  character={<Icon type='heart' />} disabled value={value} />,
+      title: '年龄',
+      dataIndex: 'age',
+      width: 100,
     },
     {
-      title: '发布时间',
+      title: '职业',
+      dataIndex: 'work',
+      width: 120,
+    },
+    {
+      title: '手机号',
+      dataIndex: 'phone',
+      width: 120,
+    },
+    {
+      title: '住址',
+      dataIndex: 'address',
+      width: 120,
+    },
+    {
+      title: '注册时间',
       dataIndex: 'createdAt',
       sorter: (a, b) => +a.createdAt - +b.createdAt,
       width: 200,
       render: (value) => moment(+value).format('YYYY-MM-DD HH:mm:ss'),
-    },
-    {
-      title: '更新时间',
-      dataIndex: 'updatedAt',
-      sorter: (a, b) => +a.updatedAt - +b.updatedAt,
-      width: 200,
-      render: (value) => moment(+value).format('YYYY-MM-DD HH:mm:ss'),
-    },
-    {
-      title: '操作',
-      dataIndex: 'action',
-      width: 140,
-      render: (_, record) => (
-        <>
-          <a onClick={() => this.clickDetail(record)}>查看</a>
-          <Divider type='vertical' />
-          <a onClick={() => this.clickEdit(record)}>编辑</a>
-          <Divider type='vertical' />
-          <a onClick={() => this.clickDelete(record)}>删除</a>
-        </>
-      ),
     },
   ]
 
@@ -176,39 +183,46 @@ export default class UForm extends Component {
         <div className='formBody'>
           <Row gutter={16}>
             <Col className='gutter-row' sm={8}>
+              <span className='filterTitle'>姓名：</span>
               <Search
-                placeholder='请输入资讯标题'
+                placeholder='请输入姓名'
                 prefix={<Icon type='user' />}
-                value={filter.title}
-                onChange={(e) => this.onChangeUserName(e, 'title')}
+                value={filter.userName}
+                onChange={(e) => this.onChangeUserName(e, 'userName')}
               />
             </Col>
             <Col className='gutter-row' sm={8}>
-              <Select
-                placeholder='请选择推荐指数'
-                style={{ width: '100%' }}
+              <span className='filterTitle'>住址：</span>
+              <Search
+                placeholder='住址'
                 prefix={<Icon type='user' />}
-                value={filter.level}
-                onChange={(e) => this.onChangeUserName(e, 'level')}
+                value={filter.address}
+                onChange={(e) => this.onChangeUserName(e, 'address')}
+              />
+            </Col>
+          </Row>
+          <Row>
+            <Col className='gutter-row' sm={8}>
+              <span className='filterTitle'>职业：</span>
+              <Select
+                onChange={(e) => this.onChangeUserName(e, 'work')}
+                style={{ width: '100%' }}
               >
-                <Select.Option value={1}>1</Select.Option>
-                <Select.Option value={2}>2</Select.Option>
-                <Select.Option value={3}>3</Select.Option>
-                <Select.Option value={4}>4</Select.Option>
-                <Select.Option value={5}>5</Select.Option>
+                {Work.map((item) => (
+                  <Select.Option key={item} value={item}>
+                    {item}
+                  </Select.Option>
+                ))}
               </Select>
+              {/* <Search
+                placeholder='请输入手机号'
+                prefix={<Icon type='user' />}
+                value={filter.phone}
+                onChange={(e) => this.onChangeUserName(e, 'phone')}
+              /> */}
             </Col>
           </Row>
           <Row gutter={16}>
-            <Button
-              type='primary'
-              onClick={() => {
-                window.open('#baseNews')
-              }}
-              style={{ marginLeft: '8px' }}
-            >
-              发布资讯
-            </Button>
             <div className='btnOpera'>
               <Button
                 type='primary'
@@ -230,13 +244,20 @@ export default class UForm extends Component {
               </Button>
             </div>
           </Row>
-          <BaseTable
+          {/* <BaseTable
             columns={this.columns}
             dataSource={dataSource}
             checkChange={this.checkChange}
             onDelete={this.onDelete}
             editClick={this.editClick}
             loading={loading}
+          /> */}
+          <ExportExcel
+            loading={loading}
+            tHeader={tHeader}
+            filterVal={filterVal}
+            columns={this.columns}
+            data={dataSource}
           />
         </div>
       </div>

@@ -14,24 +14,19 @@ const menuList = [
     icon: 'bars',
   },
   {
-    title: '备忘录',
-    path: '/note',
-    icon: 'book',
+    title: '医生管理',
+    path: '/doctorManage',
+    icon: 'team',
   },
   {
-    title: '资讯管理',
-    path: '/newsManage',
-    icon: 'read',
+    title: '用户管理',
+    path: '/userManage',
+    icon: 'team',
   },
   {
     title: '患者管理',
     path: '/patientManage',
     icon: 'team',
-  },
-  {
-    title: '个人中心',
-    path: '/userInfo',
-    icon: 'user',
   },
   {
     title: '药品管理-admin',

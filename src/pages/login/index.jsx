@@ -33,15 +33,7 @@ const Login = (props) => {
       // 检验成功
       if (!err) {
         if (key === '1') {
-          console.log(111)
-          const res = await axios({
-            url: 'http://localhost:8088/interface/User/userLogin',
-            method: 'post',
-            data: values,
-          })
-          console.log('res', res)
-          const { userInfo } = res
-          Cookie.set('userInfo', userInfo, {
+          Cookie.set('userInfo', {}, {
             expires: new Date(new Date().getTime() + 1 * 60 * 60 * 1000),
           })
           message.success({content:'登录成功！'})
@@ -68,7 +60,7 @@ const Login = (props) => {
     return <Redirect to='/dashboard' />
   }
   return (
-    <DocumentTitle title={'医生登录'}>
+    <DocumentTitle title={'管理员登录'}>
       <div className='login-container'>
         <div className='content'>
           <Spin spinning={loading} tip='登录中...'>
@@ -77,7 +69,7 @@ const Login = (props) => {
               defaultActiveKey='1'
               onChange={(e) => setKey(e)}
             >
-              <TabPane tab='医生登录' key='1'>
+              <TabPane tab='管理员登录' key='1'>
                 <Form onSubmit={handleSubmit}>
                   <Form.Item>
                     {getFieldDecorator('phone', {
@@ -88,7 +80,7 @@ const Login = (props) => {
                           message: '请输入手机号',
                         },
                       ],
-                      initialValue: '15555555555', // 初始值
+                      initialValue: 'admin', // 初始值
                     })(
                       <Input
                         prefix={
@@ -110,7 +102,7 @@ const Login = (props) => {
                           message: '请输入密码',
                         },
                       ],
-                      initialValue: '123456', // 初始值
+                      initialValue: 'admin', // 初始值
                     })(
                       <Input
                         prefix={
@@ -135,196 +127,7 @@ const Login = (props) => {
                   </Form.Item>
                 </Form>
               </TabPane>
-              {/* 注册模块 */}
-              <TabPane tab='医生注册' key='2'>
-                <Form onSubmit={handleSubmit}>
-                  {/* <Form.Item>
-                    {getFieldDecorator('userName', {
-                      rules: [
-                        {
-                          required: key === '2',
-                          whitespace: true,
-                          message: '请输入用户名',
-                        },
-                      ],
-                    })(
-                      <Input
-                        prefix={
-                          <Icon
-                            type='user'
-                            style={{ color: 'rgba(0,0,0,.25)' }}
-                          />
-                        }
-                        placeholder='用户名'
-                      />
-                    )}
-                  </Form.Item> */}
-                  
-                  <Form.Item>
-                    {getFieldDecorator('userName', {
-                      rules: [
-                        {
-                          required: key === '2',
-                          whitespace: true,
-                          message: '请输入真实姓名',
-                        },
-                      ],
-                    })(
-                      <Input
-                        prefix={
-                          <Icon
-                            type='user'
-                            style={{ color: 'rgba(0,0,0,.25)' }}
-                          />
-                        }
-                        placeholder='真实姓名'
-                      />
-                    )}
-                  </Form.Item>
-                  <Form.Item>
-                    {getFieldDecorator('phone', {
-                      rules: [
-                        {
-                          required: key === '2',
-                          message: '请输入手机号',
-                        },
-                      ],
-                    })(
-                      <Input
-                        prefix={
-                          <Icon
-                            type='lock'
-                            style={{ color: 'rgba(0,0,0,.25)' }}
-                          />
-                        }
-                        type='phone'
-                        placeholder='手机号'
-                      />
-                    )}
-                  </Form.Item>
-                  <Form.Item>
-                    {getFieldDecorator('passWord', {
-                      rules: [
-                        {
-                          required: key === '2',
-                          whitespace: true,
-                          message: '请输入密码',
-                        },
-                      ],
-                    })(
-                      <Input
-                        prefix={
-                          <Icon
-                            type='lock'
-                            style={{ color: 'rgba(0,0,0,.25)' }}
-                          />
-                        }
-                        type='password'
-                        placeholder='密码'
-                      />
-                    )}
-                  </Form.Item>
-                  <Form.Item>
-                    {getFieldDecorator('address', {
-                      rules: [
-                        {
-                          required: key === '2',
-                          message: '请输入地址',
-                        },
-                      ],
-                    })(
-                      <Input
-                        prefix={
-                          <Icon
-                            type='lock'
-                            style={{ color: 'rgba(0,0,0,.25)' }}
-                          />
-                        }
-                        placeholder='地址'
-                      />
-                    )}
-                  </Form.Item>
-                  <Form.Item>
-                    {getFieldDecorator('age', {
-                      rules: [
-                        {
-                          required: key === '2',
-                          message: '请输入年龄',
-                        },
-                      ],
-                    })(
-                      <Input
-                        prefix={
-                          <Icon
-                            type='lock'
-                            style={{ color: 'rgba(0,0,0,.25)' }}
-                          />
-                        }
-                        placeholder='年龄'
-                      />
-                    )}
-                  </Form.Item>
-                  <Form.Item>
-                    {getFieldDecorator('sex', {
-                      rules: [
-                        {
-                          required: key === '2',
-                          message: '请选择性别',
-                        },
-                      ],
-                    })(
-                      <Select placeholder='性别'>
-                       <Select.Option value='1'>男</Select.Option>
-                       <Select.Option value='2'>女</Select.Option>
-                      </Select>
-                    )}
-                  </Form.Item>
-                  <Form.Item>
-                    {getFieldDecorator('department', {
-                      rules: [
-                        {
-                          required: key === '2',
-                          whitespace: true,
-                          message: '请选择科室',
-                        },
-                      ],
-                    })(
-                      <Select placeholder='科室'>
-                        {
-                          DepartmentOpt
-                        }
-                      </Select>
-                    )}
-                  </Form.Item>
-                  <Form.Item>
-                    {getFieldDecorator('level', {
-                      rules: [
-                        {
-                          required: key === '2',
-                          whitespace: true,
-                          message: '请选择职级',
-                        },
-                      ],
-                    })(
-                      <Select 
-                      placeholder='职级'>
-                        {
-                          LevelOpt
-                        }
-                      </Select>
-                    )}
-                  </Form.Item>
-                  <Form.Item>
-                    <Button
-                      type='primary'
-                      htmlType='submit'
-                      className='login-form-button'
-                    >
-                      注册
-                    </Button>
-                  </Form.Item>
-                </Form>
-              </TabPane>
+             
             </Tabs>
           </Spin>
         </div>

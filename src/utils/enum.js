@@ -4,3 +4,5 @@ export const Department = ['内科','外科','妇科','儿科','耳鼻喉科','�
 export const Level = ['医师','主治医师','副主任医师','主任医师']
 // 资讯版块
 export const Section = ['健康养生','美容减肥','康复技巧','特别推荐']
+// 职业
+export const Work = ['程序员','教师','医护人员','司机','创业者']
