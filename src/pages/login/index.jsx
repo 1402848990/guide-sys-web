@@ -33,12 +33,12 @@ const Login = (props) => {
       // 检验成功
       if (!err) {
         if (key === '1') {
-          Cookie.set('userInfo', {}, {
+          Cookie.set('userInfo', {userName:'admin'}, {
             expires: new Date(new Date().getTime() + 1 * 60 * 60 * 1000),
           })
           message.success({content:'登录成功！'})
           setTimeout(() => {
-            window.location.href = '/#newsManage'
+            window.location.href = '/dashboard'
           }, 1000);
           console.log('cookie',Cookie.get('userInfo'))
         } else {

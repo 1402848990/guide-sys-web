@@ -4,6 +4,11 @@
  */
 const menuList = [
   {
+    title: '首页',
+    path: '/dashboard',
+    icon: 'home',
+    },
+  {
     title: '排班设置',
     path: '/dateManage',
     icon: 'schedule',

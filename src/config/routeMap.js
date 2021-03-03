@@ -3,6 +3,7 @@
  */
 import Loadable from 'react-loadable';
 import Loading from '@/components/Loading'
+const Dashboard = Loadable({loader: () => import('@/pages/dashboard'),loading: Loading});
 const Drugs = Loadable({loader: () => import('@/pages/drugs'),loading: Loading});
 const DateManage = Loadable({loader: () => import('@/pages/dateManage'),loading: Loading});
 const OrderList = Loadable({loader: () => import('@/pages/orderList'),loading: Loading});
@@ -13,6 +14,7 @@ const AddPatient = Loadable({loader: () => import('@/pages/addPatient'),loading:
 const BaseNews = Loadable({loader: () => import('@/pages/baseNews'),loading: Loading});
 
 export default [
+  { path: "/dashboard", component: Dashboard, },
   { path: "/drugs", component: Drugs, },
   { path: "/dateManage", component: DateManage, },
   { path: "/orderList", component: OrderList, },
