@@ -3,7 +3,7 @@ import { Row, Col, Carousel, Card } from 'antd'
 import './index.less'
 import { countBy } from 'lodash'
 import axios from '../../request/axiosConfig'
-import { Column } from '@ant-design/charts'
+import { Column,Line } from '@ant-design/charts'
 
 const HOST = 'http://localhost:8088/interface'
 
@@ -17,6 +17,7 @@ const Dashboard = () => {
   const [doctorList, setDoctorList] = useState([])
   const [departmentList, setDepartmentList] = useState([])
   const [drugsList, setDrugsList] = useState([])
+  const [dateList, setDateList] = useState([])
 
   // 获取数据
   const getData = async () => {
@@ -26,7 +27,7 @@ const Dashboard = () => {
     } = await axios.post(`${HOST}/Patient/list`, { from: 'admin' })
     const { data: doctorList } = await axios.post(`${HOST}/User/doctorList`)
     const { data: drugsList } = await axios.post(`${HOST}/Drugs/drugsList`)
-    // const { data: cList } = await axios.post(`${HOST}/User/contactList`)
+    const { data: dateList } = await axios.post(`${HOST}/User/dateList`,{ from: 'admin' })
 
     patientToDoctorList.forEach((item) => {
       item.doctorName = JSON.parse(item.userInfo).userName
@@ -45,6 +46,7 @@ const Dashboard = () => {
     setDoctorList(doctorList)
     setDepartmentList(departmentList)
     setDrugsList(drugsList)
+    setDateList(dateList)
   }
 
   useEffect(() => {
@@ -139,6 +141,28 @@ const Dashboard = () => {
     return <Column {...config} />;
   }
 
+  const dateView = ()=>{
+    const _countBy = countBy(dateList, (item) => item.date)
+    console.log('_countBy',_countBy)
+    const list = Object.entries(_countBy).map((item) => {
+      const [key, value] = item
+      return { key, 人数:value }
+    })
+    console.log('list',list)
+    const config = {
+      data: list,
+      padding: 'auto',
+      xField: 'key',
+      yField: '人数',
+      xAxis: { tickCount: 5 },
+      slider: {
+        start: 0.1,
+        end: 0.8,
+      },
+    };
+    return <Line {...config} />;
+  }
+
   return (
     <div className='app-container'>
       <Card title='医院不同部门的医生数量'>
@@ -151,9 +175,13 @@ const Dashboard = () => {
         {doctAgeView()}
       </Card>
       <br />
-      <Card title='医院不同年龄的医生分布'>
+      <Card title='医院每种药品数量统计'>
         {/* 不同部门的医生数量 */}
         {drugsView()}
+      </Card>
+      <Card title='每日挂号人数统计'>
+        {/* 不同部门的医生数量 */}
+        {dateView()}
       </Card>
     </div>
   )
