@@ -1,16 +1,10 @@
+/* eslint-disable no-unused-expressions */
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { Component } from 'react'
 import './form.less'
 import moment from 'moment'
 import axios from '../../request/axiosConfig'
-import {
-  Row,
-  Col,
-  Input,
-  Card,
-  Checkbox,
-  Radio,
-} from 'antd'
+import { Row, Col, Input, Card, Checkbox, Radio } from 'antd'
 import ExportExcel from '../../components/ExportExcel'
 import { DATE } from '../../utils/index'
 import { orderBy } from 'lodash'
@@ -38,8 +32,8 @@ export default class UForm extends Component {
         third: 6,
       },
       handledData: [],
-      examContent:[],
-      courseNameList:[]
+      examContent: [],
+      courseNameList: [],
     }
   }
 
@@ -97,47 +91,60 @@ export default class UForm extends Component {
     const threeExam = []
     oneClass.forEach((item) => {
       let add = 0
-
+      let low = false
       Object.entries(item).forEach((ele) => {
         const [course, courseVal] = ele
+       
         if (selectCourse.includes(course)) {
+          courseVal < 60 ? (low = true) : null
           add = add + Number(courseVal)
         }
       })
-      item.average = +(add / selectCourse.length).toFixed(2)
+      item.average = low ? 0 : +(add / selectCourse.length).toFixed(2)
       oneExam.push(item)
     })
 
     twoClass.forEach((item) => {
       let add = 0
-
+      let low = false
       Object.entries(item).forEach((ele) => {
         const [course, courseVal] = ele
         if (selectCourse.includes(course)) {
+          courseVal < 60 ? (low = true) : null
           add = add + Number(courseVal)
         }
       })
-      item.average = +(add / selectCourse.length).toFixed(2)
+      item.average = low ? 0 : +(add / selectCourse.length).toFixed(2)
       twoExam.push(item)
     })
 
     threeClass.forEach((item) => {
       let add = 0
-
+      let low = false
       Object.entries(item).forEach((ele) => {
         const [course, courseVal] = ele
         if (selectCourse.includes(course)) {
+          courseVal < 60 ? (low = true) : null
           add = add + Number(courseVal)
         }
       })
-      item.average = +(add / selectCourse.length).toFixed(2)
+      item.average = low ? 0 : +(add / selectCourse.length).toFixed(2)
       threeExam.push(item)
     })
     // 根据平均分倒序排序
     return {
-      oneExamOrder: orderBy(oneExam, ['average'],['desc']).slice(0, topConfig.third),
-      twoExamOrder: orderBy(twoExam, ['average'],['desc']).slice(0, topConfig.third),
-      threeExamOrder: orderBy(threeExam, ['average',['desc']]).slice(0, topConfig.third),
+      oneExamOrder: orderBy(oneExam, ['average'], ['desc']).slice(
+        0,
+        topConfig.third
+      ),
+      twoExamOrder: orderBy(twoExam, ['average'], ['desc']).slice(
+        0,
+        topConfig.third
+      ),
+      threeExamOrder: orderBy(threeExam, ['average', ['desc']]).slice(
+        0,
+        topConfig.third
+      ),
     }
   }
 
@@ -181,7 +188,7 @@ export default class UForm extends Component {
         value: item.name,
       })
     })
-    console.log('_examContent',_examContent)
+    console.log('_examContent', _examContent)
     this.setState({
       CourseOpts,
       examContent: _examContent,
@@ -200,7 +207,7 @@ export default class UForm extends Component {
     window.open(`#addStudent?id=${record.stuId}`)
   }
 
-  columns =()=> [
+  columns = () => [
     {
       title: '名次',
       dataIndex: '',
@@ -212,11 +219,11 @@ export default class UForm extends Component {
       dataIndex: '',
       width: 150,
       render: (_, record, index) => {
-        console.log('index',index)
+        console.log('index', index)
         return index + 1 <= +this.state.topConfig.first
           ? '一等奖学金'
-          : index + 1 > +this.state.topConfig.first  &&
-            index + 1 <= +this.state.topConfig.second 
+          : index + 1 > +this.state.topConfig.first &&
+            index + 1 <= +this.state.topConfig.second
           ? '二等奖学金'
           : '三等奖学金'
       },
@@ -282,18 +289,24 @@ export default class UForm extends Component {
       topConfig,
       selectCourse,
       handledData,
-      courseNameList
+      courseNameList,
     } = this.state
     // 获取各班级排序后的成绩列表
     const { oneExamOrder, twoExamOrder, threeExamOrder } = this.handleExam(
       handledData
     )
-    const tHeader = ['学号', '姓名', '班级', '性别','学期','平均分'].concat(
+    const tHeader = ['学号', '姓名', '班级', '性别', '学期', '平均分'].concat(
       courseNameList
     )
-    const filterVal = ['stuId', 'stuName', 'garde', 'stuSex','date','average'].concat(
-      courseNameList
-    )
+    const filterVal = [
+      'stuId',
+      'stuName',
+      'garde',
+      'stuSex',
+      'date',
+      'average',
+    ].concat(courseNameList)
+    console.log(oneExamOrder)
     return (
       <div>
         <Card title='参与奖学金计算的学科'>
@@ -322,7 +335,9 @@ export default class UForm extends Component {
         <div className='formBody'>
           <Row gutter={16}>
             <Col className='gutter-row' sm={8}>
-              <span style={{color:'red'}} className='filterTitle'>一等奖学金：</span>
+              <span style={{ color: 'red' }} className='filterTitle'>
+                一等奖学金：
+              </span>
               <Input
                 addonBefore='前'
                 addonAfter='名'
@@ -331,7 +346,9 @@ export default class UForm extends Component {
               />
             </Col>
             <Col className='gutter-row' sm={8}>
-              <span style={{color:'#9C27B0'}} className='filterTitle'>二等奖学金：</span>
+              <span style={{ color: '#9C27B0' }} className='filterTitle'>
+                二等奖学金：
+              </span>
               <Input
                 addonBefore='前'
                 addonAfter='名'
@@ -340,7 +357,9 @@ export default class UForm extends Component {
               />
             </Col>
             <Col className='gutter-row' sm={8}>
-              <span style={{color:'#795548'}} className='filterTitle'>三等奖学金：</span>
+              <span style={{ color: '#795548' }} className='filterTitle'>
+                三等奖学金：
+              </span>
               <Input
                 addonBefore='前'
                 addonAfter='名'
@@ -366,7 +385,7 @@ export default class UForm extends Component {
               tHeader={tHeader}
               filterVal={filterVal}
               columns={this.columns()}
-              data={oneExamOrder}
+              data={oneExamOrder.filter((i) => i.average >= 60)}
             />
           </Card>
           <Card title='二班奖学金获奖名单'>
@@ -375,7 +394,7 @@ export default class UForm extends Component {
               tHeader={tHeader}
               filterVal={filterVal}
               columns={this.columns()}
-              data={twoExamOrder}
+              data={twoExamOrder.filter((i) => i.average >= 60)}
             />
           </Card>
           <Card title='三班奖学金获奖名单'>
@@ -384,7 +403,7 @@ export default class UForm extends Component {
               tHeader={tHeader}
               filterVal={filterVal}
               columns={this.columns()}
-              data={threeExamOrder}
+              data={threeExamOrder.filter((i) => i.average >= 60)}
             />
           </Card>
         </div>

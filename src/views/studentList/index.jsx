@@ -151,7 +151,10 @@ export default class UForm extends Component {
         { text: '男', value: '男' },
         { text: '女', value: '女' },
       ],
-      onFilter: (value, record) => record.sex === value,
+      onFilter: (value, record) => {
+        console.log('record.sex', record.sex, 'value', value)
+        return record.sex === value
+      },
     },
     {
       title: '职务',
@@ -200,16 +203,16 @@ export default class UForm extends Component {
         <div className='formBody'>
           <Row gutter={16}>
             <Col className='gutter-row' sm={8}>
-                  <span className='filterTitle'>姓名：</span>
-                  <Search
-                    placeholder='请输入姓名'
-                    prefix={<Icon type='user' />}
-                    value={filter.name}
-                    onChange={(e) => this.onChangeUserName(e, 'name')}
-                  />
+              <span className='filterTitle'>姓名：</span>
+              <Search
+                placeholder='请输入姓名'
+                prefix={<Icon type='user' />}
+                value={filter.name}
+                onChange={(e) => this.onChangeUserName(e, 'name')}
+              />
             </Col>
             <Col className='gutter-row' sm={8}>
-            <span className='filterTitle'>班级：</span>
+              <span className='filterTitle'>班级：</span>
               <Select
                 placeholder='请选择班级'
                 style={{ width: '100%' }}
@@ -223,7 +226,7 @@ export default class UForm extends Component {
               </Select>
             </Col>
             <Col className='gutter-row' sm={8}>
-            <span className='filterTitle'>职务：</span>
+              <span className='filterTitle'>职务：</span>
               <Search
                 placeholder='请输入职务'
                 prefix={<Icon type='user' />}

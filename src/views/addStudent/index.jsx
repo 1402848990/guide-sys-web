@@ -207,21 +207,21 @@ class UserInfo extends React.Component {
       width: 200,
       render: (value) => moment(+value).format('YYYY-MM-DD HH:mm:ss'),
     },
-    {
-      title: '操作',
-      fixed: 'right',
-      dataIndex: 'action',
-      width: 140,
-      render: (_, record) => (
-        <>
-          <a onClick={() => this.clickDetail(record)}>查看</a>
-          <Divider type='vertical' />
-          <a onClick={() => this.clickEdit(record)}>编辑</a>
-          <Divider type='vertical' />
-          <a onClick={() => this.clickDelete(record)}>删除</a>
-        </>
-      ),
-    },
+    // {
+    //   title: '操作',
+    //   fixed: 'right',
+    //   dataIndex: 'action',
+    //   width: 140,
+    //   render: (_, record) => (
+    //     <>
+    //       <a onClick={() => this.clickDetail(record)}>查看</a>
+    //       <Divider type='vertical' />
+    //       <a onClick={() => this.clickEdit(record)}>编辑</a>
+    //       <Divider type='vertical' />
+    //       <a onClick={() => this.clickDelete(record)}>删除</a>
+    //     </>
+    //   ),
+    // },
   ]
 
   handlePicChange = (e) => {
@@ -308,7 +308,7 @@ class UserInfo extends React.Component {
       name,
       level,
       stuId,
-    } = this.state.userInfo
+    } = this.state.userInfo||{}
     const { courseNameList, examList = [] } = this.state
     const tHeader = ['学号', '姓名', '学期', '班级', '性别'].concat(
       courseNameList

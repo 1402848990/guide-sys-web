@@ -3,7 +3,7 @@ import React, { Component } from 'react'
 import './form.less'
 import moment from 'moment'
 import axios from '../../request/axiosConfig'
-import { Column,Bar } from '@ant-design/charts'
+import { Column, Bar } from '@ant-design/charts'
 import {
   Row,
   Col,
@@ -41,8 +41,74 @@ export default class UForm extends Component {
     }
   }
 
+  // 格式化及格人数数据
+  fun = (data) => {
+    console.log('data',data)
+    const a =  data[0] ?JSON.parse(data[0].content) : []
+    const courselist = Object.keys(a)
+    const res = {}
+    console.log('courselist',courselist)
+    courselist.forEach((course) => {
+      res[course] = []
+    })
+    data.forEach((i) => {
+      courselist.forEach((course) => {
+        const fen = +i[course]
+        if (fen >= 60) {
+          res[course] ? res[course].push(fen) : (res[course] = [fen])
+        }
+      })
+    })
+    console.log('res', res)
+    const handledDate = Object.entries(res).map((item) => {
+      console.log('item', item)
+      const [course, numArr] = item
+      return {
+        class: data[0].garde,
+        course,
+        number: numArr.length,
+      }
+    })
+    console.log('handledDate', handledDate)
+    return handledDate
+  }
+
+  jisuan = arr=>{
+    const res = arr.filter(i=>i>=60)
+    return res.length/arr.length
+  }
+
+  // 格式化及格人数比例数据
+  funBar = (data) => {
+    const a =  data[0] ?JSON.parse(data[0].content) : []
+    const courselist = Object.keys(a)
+    const res = {}
+    courselist.forEach((course) => {
+      res[course] = []
+    })
+    data.forEach((i) => {
+      courselist.forEach((course) => {
+        const fen = +i[course]
+          res[course] ? res[course].push(fen) : (res[course] = [fen])
+      })
+    })
+    console.log('res', res)
+    const handledDate = Object.entries(res).map((item) => {
+      console.log('item', item)
+      const [course, numArr] = item
+      return {
+        class: data[0].garde,
+        course,
+        number: this.jisuan(numArr).toFixed(2),
+      }
+    })
+    console.log('handledDate', handledDate)
+    return handledDate
+  }
+
   formatData = (_handledData) => {
-    const { currDate } = this.state
+    const { currDate, courseList } = this.state
+
     // 各个班级当前学期的成绩
     const oneClass = _handledData.filter(
       (item) => item.garde === '一班' && item.date === currDate
@@ -54,145 +120,18 @@ export default class UForm extends Component {
       (item) => item.garde === '三班' && item.date === currDate
     )
 
-    // 各个班级JAVA成绩
-    const twoClassJavaArr = []
-    const oneClassJavaArr = []
-    const threeClassJavaArr = []
+    const one = this.fun(oneClass)
+    const two = this.fun(twoClass)
+    const three = this.fun(threeClass)
 
-    // 各个班级数据结构成绩
-    const twoClassDataArr = []
-    const oneClassDataArr = []
-    const threeClassDataArr = []
+    const onebar = this.funBar(oneClass)
+    const twobar = this.funBar(twoClass)
+    const threebar = this.funBar(threeClass)
 
-    // 各个班级高数成绩
-    const twoClassMathArr = []
-    const oneClassMathArr = []
-    const threeClassMathArr = []
-
-    oneClass.forEach((item) => {
-      oneClassJavaArr.push(item['JAVA'])
-      oneClassDataArr.push(item['数据结构'])
-      oneClassMathArr.push(item['高数'])
-    })
-    twoClass.forEach((item) => {
-      twoClassJavaArr.push(item['JAVA'])
-      twoClassDataArr.push(item['数据结构'])
-      twoClassMathArr.push(item['高数'])
-    })
-    threeClass.forEach((item) => {
-      threeClassJavaArr.push(item['JAVA'])
-      threeClassDataArr.push(item['数据结构'])
-      threeClassMathArr.push(item['高数'])
-    })
-
-    const one = [
-      {
-        class: '一班',
-        course: 'JAVA',
-        number: oneClassJavaArr.map((item) => item >= 60).length,
-      },
-      {
-        class: '一班',
-        course: '数据结构',
-        number: oneClassDataArr.map((item) => item >= 60).length,
-      },
-      {
-        class: '一班',
-        course: '高数',
-        number: oneClassMathArr.map((item) => item >= 60).length,
-      },
-    ]
-
-    const two = [
-      {
-        class: '二班',
-        course: 'JAVA',
-        number: twoClassJavaArr.map((item) => item >= 60).length,
-      },
-      {
-        class: '二班',
-        course: '数据结构',
-        number: twoClassDataArr.map((item) => item >= 60).length,
-      },
-      {
-        class: '二班',
-        course: '高数',
-        number: twoClassMathArr.map((item) => item >= 60).length,
-      },
-    ]
-
-    const three = [
-      {
-        class: '三班',
-        course: 'JAVA',
-        number: threeClassJavaArr.map((item) => item >= 60).length,
-      },
-      {
-        class: '三班',
-        course: '数据结构',
-        number: threeClassDataArr.map((item) => item >= 60).length,
-      },
-      {
-        class: '三班',
-        course: '高数',
-        number: threeClassMathArr.map((item) => item >= 60).length,
-      },
-    ]
-
-    const onebar = [
-      {
-        class: '一班',
-        course: 'JAVA',
-        number: oneClassJavaArr.filter((item) => item >= 60).length/ oneClassJavaArr.length,
-      },
-      {
-        class: '一班',
-        course: '数据结构',
-        number: oneClassDataArr.filter((item) => item >= 60).length/oneClassDataArr.length,
-      },
-      {
-        class: '一班',
-        course: '高数',
-        number: oneClassMathArr.filter((item) => item >= 60).length/oneClassMathArr.length,
-      },
-    ]
-
-    const twobar = [
-      {
-        class: '二班',
-        course: 'JAVA',
-        number: twoClassJavaArr.filter((item) => item >= 60).length/twoClassJavaArr.length,
-      },
-      {
-        class: '二班',
-        course: '数据结构',
-        number: twoClassDataArr.filter((item) => item >= 60).length/twoClassDataArr.length,
-      },
-      {
-        class: '二班',
-        course: '高数',
-        number: twoClassMathArr.filter((item) => item >= 60).length/twoClassMathArr.length,
-      },
-    ]
-
-    const threebar = [
-      {
-        class: '三班',
-        course: 'JAVA',
-        number: threeClassJavaArr.filter((item) => item >= 60).length/threeClassJavaArr.length,
-      },
-      {
-        class: '三班',
-        course: '数据结构',
-        number: threeClassDataArr.filter((item) => item >= 60).length/threeClassDataArr.length,
-      },
-      {
-        class: '三班',
-        course: '高数',
-        number: threeClassMathArr.filter((item) => item >= 60).length/threeClassMathArr.length,
-      },
-    ]
-    return {num:[...one, ...two, ...three],bar:[...onebar,...twobar,...threebar]}
+    return {
+      num: [...one, ...two, ...three],
+      bar: [...onebar, ...twobar, ...threebar],
+    }
   }
 
   // 获取数据
@@ -221,6 +160,7 @@ export default class UForm extends Component {
     })
 
     const handledData = data.map((item) => {
+      console.log('----item',item)
       const content = JSON.parse(item.content)
       for (let i in content) {
         item[i] = content[i]
@@ -409,7 +349,7 @@ export default class UForm extends Component {
     )
     const numData = this.formatData(dataSource).num
     const barData = this.formatData(dataSource).bar
-    console.log('numData', numData, 'currDate', currDate)
+    console.log('barData', barData, 'currDate', currDate,'numData',numData)
     const config = {
       data: numData,
       isGroup: true,
@@ -434,7 +374,7 @@ export default class UForm extends Component {
       seriesField: 'course',
       label: {
         content: function content(item) {
-          return `${(item.number*100).toFixed(2)}%`;
+          return `${(item.number * 100).toFixed(2)}%`
         },
         style: { fill: '#fff' },
         position: 'middle',
