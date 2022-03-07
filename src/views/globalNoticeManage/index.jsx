@@ -3,6 +3,7 @@ import React, { Component } from 'react'
 import './form.less'
 import moment from 'moment'
 import axios from '../../request/axiosConfig'
+import { AREA_LIST } from '@/utils'
 import {
   Row,
   Col,
@@ -14,18 +15,15 @@ import {
   Modal,
   message,
   Select,
-  Card,
+  Tag,
 } from 'antd'
-import CourseTag from '../../components/CourseTag'
+
 import BaseTable from '../../components/BaseTable'
-import ExportExcel from '../../components/ExportExcel'
 
 const Search = Input.Search
+const { CheckableTag } = Tag
 
 const HOST = 'http://localhost:8088/interface'
-
-const tHeader = ['学号', '姓名', '班级', '性别', '职务']
-const filterVal = ['stuId', 'name', 'garde', 'sex', 'level']
 
 export default class UForm extends Component {
   constructor(props) {
@@ -34,12 +32,13 @@ export default class UForm extends Component {
       filter: {},
       dataSource: [],
       loading: true,
+      selectedTags: [],
     }
   }
   // 获取数据
   getData = async () => {
-    const res = await axios.post(`${HOST}/Stu/list`, {
-      filter: this.state.filter,
+    const res = await axios.post(`${HOST}/Global/globalNoticeList`, {
+      filter:  {...this.state.filter,areaName:this.state.selectedTags.join(',')} ,
     })
     this.setState(
       {
@@ -56,7 +55,7 @@ export default class UForm extends Component {
   onChangeUserName = (e, field) => {
     console.log(e)
     if (e) {
-      const value = !e?.target ? e : e?.target?.value
+      const value = !isNaN(+e) ? e : e?.target?.value
       const _filter = this.state.filter
       this.setState({
         filter: {
@@ -65,6 +64,15 @@ export default class UForm extends Component {
         },
       })
     }
+  }
+
+  handleChange = (tag, checked) => {
+    const nextSelectedTags = checked
+      ? [tag]
+      : this.state.selectedTags.filter((t) => t !== tag)
+    this.setState({
+      selectedTags: nextSelectedTags,
+    })
   }
 
   //渲染
@@ -80,6 +88,7 @@ export default class UForm extends Component {
     this.setState(
       {
         filter: {},
+        selectedTags:[]
       },
       () => {
         this.getData()
@@ -93,21 +102,21 @@ export default class UForm extends Component {
   }
 
   clickDetail = (record) => {
-    window.open(`#addStudent?id=${record.stuId}`)
+    window.open(`#baseGlobalNotice?id=${record.id}`)
   }
 
   clickEdit = (record) => {
-    window.open(`#addStudent?edit&id=${record.stuId}`)
+    window.open(`#baseGlobalNotice?id=${record.id}&edit`)
   }
 
   clickDelete = (item) => {
     const _this = this
     Modal.confirm({
-      title: `确定删除学生【${item.name}】吗`,
+      title: `确定删除全国疫情播报吗`,
       content: '',
       async onOk() {
         await axios({
-          url: 'http://localhost:8088/interface/Stu/delete',
+          url: 'http://localhost:8088/interface/Global/deleteGlobalNotice',
           method: 'post',
           data: { id: item.id },
         })
@@ -122,44 +131,26 @@ export default class UForm extends Component {
 
   columns = [
     {
-      title: '学号',
-      dataIndex: 'stuId',
+      title: 'ID',
+      dataIndex: 'id',
       width: 80,
       sorter: (a, b) => +a.id - +b.id,
     },
     {
-      title: '姓名',
-      dataIndex: 'name',
+      title: '疫情播报标题',
+      dataIndex: 'title',
       width: 180,
     },
     {
-      title: '班级',
-      dataIndex: 'garde',
+      title: '播报地区',
+      dataIndex: 'areaName',
       width: 180,
-      filters: [
-        { text: '一班', value: '一班' },
-        { text: '二班', value: '二班' },
-        { text: '三班', value: '三班' },
-      ],
-      onFilter: (value, record) => record.garde === value,
     },
     {
-      title: '性别',
-      dataIndex: 'sex',
-      width: 180,
-      filters: [
-        { text: '男', value: '男' },
-        { text: '女', value: '女' },
-      ],
-      onFilter: (value, record) => {
-        console.log('record.sex', record.sex, 'value', value)
-        return record.sex === value
-      },
-    },
-    {
-      title: '职务',
+      title: '乐观等级',
       dataIndex: 'level',
       width: 150,
+      render: (value) => <Rate disabled value={value} />,
     },
     {
       title: '创建时间',
@@ -177,14 +168,13 @@ export default class UForm extends Component {
     },
     {
       title: '操作',
-      fixed: 'right',
       dataIndex: 'action',
       width: 140,
       render: (_, record) => (
         <>
           <a onClick={() => this.clickDetail(record)}>查看</a>
           <Divider type='vertical' />
-          <a onClick={() => this.clickEdit(record)}>编辑</a>
+          <a onClick={() => this.clickEdit(record)}>修改</a>
           <Divider type='vertical' />
           <a onClick={() => this.clickDelete(record)}>删除</a>
         </>
@@ -197,53 +187,42 @@ export default class UForm extends Component {
     console.log(filter)
     return (
       <div>
-        <Card title='课程管理'>
-          <CourseTag />
-        </Card>
         <div className='formBody'>
           <Row gutter={16}>
             <Col className='gutter-row' sm={8}>
-              <span className='filterTitle'>姓名：</span>
               <Search
-                placeholder='请输入姓名'
+                placeholder='请输入疫情播报标题名'
                 prefix={<Icon type='user' />}
-                value={filter.name}
-                onChange={(e) => this.onChangeUserName(e, 'name')}
+                value={filter.title}
+                onChange={(e) => this.onChangeUserName(e, 'title')}
               />
             </Col>
             <Col className='gutter-row' sm={8}>
-              <span className='filterTitle'>班级：</span>
               <Select
-                placeholder='请选择班级'
+                placeholder='请选择重要等级'
                 style={{ width: '100%' }}
-                prefix={<Icon type='user' />}
-                value={filter.garde}
-                onChange={(e) => this.onChangeUserName(e, 'garde')}
-              >
-                <Select.Option value='一班'>一班</Select.Option>
-                <Select.Option value='二班'>二班</Select.Option>
-                <Select.Option value='三班'>三班</Select.Option>
-              </Select>
-            </Col>
-            <Col className='gutter-row' sm={8}>
-              <span className='filterTitle'>职务：</span>
-              <Search
-                placeholder='请输入职务'
                 prefix={<Icon type='user' />}
                 value={filter.level}
                 onChange={(e) => this.onChangeUserName(e, 'level')}
-              />
+              >
+                <Select.Option value={1}>1</Select.Option>
+                <Select.Option value={2}>2</Select.Option>
+                <Select.Option value={3}>3</Select.Option>
+                <Select.Option value={4}>4</Select.Option>
+                <Select.Option value={5}>5</Select.Option>
+              </Select>
             </Col>
           </Row>
+          <br />
           <Row gutter={16}>
             <Button
               type='primary'
               onClick={() => {
-                window.open('#addStudent')
+                window.open('#baseGlobalNotice')
               }}
               style={{ marginLeft: '8px' }}
             >
-              添加学生
+              添加全国播报
             </Button>
             <div className='btnOpera'>
               <Button
@@ -266,20 +245,13 @@ export default class UForm extends Component {
               </Button>
             </div>
           </Row>
-          {/* <BaseTable
+          <BaseTable
             columns={this.columns}
             dataSource={dataSource}
             checkChange={this.checkChange}
             onDelete={this.onDelete}
             editClick={this.editClick}
             loading={loading}
-          /> */}
-          <ExportExcel
-            loading={loading}
-            tHeader={tHeader}
-            filterVal={filterVal}
-            columns={this.columns}
-            data={dataSource}
           />
         </div>
       </div>

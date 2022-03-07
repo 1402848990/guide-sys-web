@@ -171,18 +171,6 @@ class UserInfo extends React.Component {
               ],
             })(<Input type='eamil' placeholder='邮箱' />)}
           </Form.Item>
-          <Form.Item label='年级'>
-            {getFieldDecorator('garde', {
-              initialValue: garde,
-              rules: [
-                {
-                  required: true,
-                  whitespace: true,
-                  message: '请输入年级',
-                },
-              ],
-            })(<Input placeholder='年级' />)}
-          </Form.Item>
           <Form.Item label='手机号'>
             {getFieldDecorator('phone', {
               initialValue: phone,

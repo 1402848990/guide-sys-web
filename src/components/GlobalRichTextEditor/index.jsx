@@ -39,7 +39,7 @@ const RichTextEditor = () => {
   // 获取数据
   const getDetail = async (id) => {
     // const
-    const res = await axios.post(`${HOST}/User/detailCityNotice`, {
+    const res = await axios.post(`${HOST}/Global/detailGlobalNotice`, {
       id,
     })
     return res.data
@@ -60,7 +60,7 @@ const RichTextEditor = () => {
           const contentState = ContentState.createFromBlockArray(
             contentBlock.contentBlocks
           )
-          setSelectedTags(record.areaName.split(','))
+          // setSelectedTags(record.areaName.split(','))
           setTitle(record.title)
           setLevel(record.level)
           setEditorState(EditorState.createWithContent(contentState))
@@ -75,7 +75,7 @@ const RichTextEditor = () => {
             const contentState = ContentState.createFromBlockArray(
               contentBlock.contentBlocks
             )
-            setSelectedTags(record.areaName.split(','))
+            // setSelectedTags(record.areaName.split(','))
             setTitle(record.title)
             setLevel(record.level)
             setEditorState(EditorState.createWithContent(contentState))
@@ -105,8 +105,8 @@ const RichTextEditor = () => {
     console.log('title',title,'level',level,'selectTags',selectedTags)
     const res = await axios({
       url: edit
-        ? 'http://localhost:8088/interface/User/updateCityNotice'
-        : 'http://localhost:8088/interface/User/addCityNotice',
+        ? 'http://localhost:8088/interface/Global/updateGlobalNotice'
+        : 'http://localhost:8088/interface/Global/addGlobalNotice',
       method: 'post',
       data: edit
         ? {
@@ -130,7 +130,7 @@ const RichTextEditor = () => {
 
   return (
     <div>
-      <Card bordered={false} title='地区疫情信息播报'>
+      <Card bordered={false} title='全国疫情信息播报'>
         {show ? (
           <Descriptions title='城市疫情播报基本信息'>
             <Descriptions.Item label='创建时间'>
@@ -141,7 +141,7 @@ const RichTextEditor = () => {
             </Descriptions.Item>
           </Descriptions>
         ) : null}
-        <h1 style={{ marginTop: '10px' }}>选择播报地区：</h1>
+        {/* <h1 style={{ marginTop: '10px' }}>选择播报全国：</h1>
         <div>
           {AREA_LIST().map((tag) => (
             <CheckableTag
@@ -154,7 +154,7 @@ const RichTextEditor = () => {
             </CheckableTag>
           ))}
         </div>
-        <br />
+        <br /> */}
         <h1>疫情播报标题：</h1>
         {show ? (
           title

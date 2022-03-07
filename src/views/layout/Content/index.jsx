@@ -9,7 +9,7 @@ import menuList from '@/config/menuConfig'
 const { Content } = Layout
 
 const getPageTitle = (menuList, pathname) => {
-  let title = 'Ant Design Pro'
+  let title = '疫情可视化管理系统'
   let item = getMenuItemInMenuListByProperty(menuList, 'path', pathname)
   if (item) {
     title = `${item.title}`
@@ -31,7 +31,7 @@ const LayoutContent = (props) => {
             exit={false}
           >
             <Switch location={location}>
-              <Redirect exact from='/' to='/dashboard' />
+              <Redirect exact from='/' to='/siteMessageManage' />
               {routeList.map((route) => {
                 return (
                   <Route

@@ -3,6 +3,7 @@ import React, { Component } from 'react'
 import './form.less'
 import moment from 'moment'
 import axios from '../../request/axiosConfig'
+import { AREA_LIST } from '@/utils'
 import {
   Row,
   Col,
@@ -14,11 +15,13 @@ import {
   Modal,
   message,
   Select,
+  Tag,
 } from 'antd'
 
 import BaseTable from '../../components/BaseTable'
 
 const Search = Input.Search
+const { CheckableTag } = Tag
 
 const HOST = 'http://localhost:8088/interface'
 
@@ -29,12 +32,13 @@ export default class UForm extends Component {
       filter: {},
       dataSource: [],
       loading: true,
+      selectedTags: [],
     }
   }
   // 获取数据
   getData = async () => {
-    const res = await axios.post(`${HOST}/User/planList`, {
-      filter: this.state.filter,
+    const res = await axios.post(`${HOST}/User/cityNoticeList`, {
+      filter:  {...this.state.filter,areaName:this.state.selectedTags.join(',')} ,
     })
     this.setState(
       {
@@ -62,6 +66,15 @@ export default class UForm extends Component {
     }
   }
 
+  handleChange = (tag, checked) => {
+    const nextSelectedTags = checked
+      ? [tag]
+      : this.state.selectedTags.filter((t) => t !== tag)
+    this.setState({
+      selectedTags: nextSelectedTags,
+    })
+  }
+
   //渲染
   componentDidMount() {
     this.getData()
@@ -75,6 +88,7 @@ export default class UForm extends Component {
     this.setState(
       {
         filter: {},
+        selectedTags:[]
       },
       () => {
         this.getData()
@@ -98,11 +112,11 @@ export default class UForm extends Component {
   clickDelete = (item) => {
     const _this = this
     Modal.confirm({
-      title: `确定删除工作计划吗`,
+      title: `确定删除城市疫情播报吗`,
       content: '',
       async onOk() {
         await axios({
-          url: 'http://localhost:8088/interface/User/deletePlan',
+          url: 'http://localhost:8088/interface/User/deleteCityNotice',
           method: 'post',
           data: { id: item.id },
         })
@@ -123,12 +137,17 @@ export default class UForm extends Component {
       sorter: (a, b) => +a.id - +b.id,
     },
     {
-      title: '计划名',
+      title: '疫情播报标题',
       dataIndex: 'title',
       width: 180,
     },
     {
-      title: '重要等级',
+      title: '播报地区',
+      dataIndex: 'areaName',
+      width: 180,
+    },
+    {
+      title: '乐观等级',
       dataIndex: 'level',
       width: 150,
       render: (value) => <Rate disabled value={value} />,
@@ -155,7 +174,7 @@ export default class UForm extends Component {
         <>
           <a onClick={() => this.clickDetail(record)}>查看</a>
           <Divider type='vertical' />
-          <a onClick={() => this.clickEdit(record)}>编辑</a>
+          <a onClick={() => this.clickEdit(record)}>修改</a>
           <Divider type='vertical' />
           <a onClick={() => this.clickDelete(record)}>删除</a>
         </>
@@ -172,7 +191,7 @@ export default class UForm extends Component {
           <Row gutter={16}>
             <Col className='gutter-row' sm={8}>
               <Search
-                placeholder='请输入计划名'
+                placeholder='请输入疫情播报标题名'
                 prefix={<Icon type='user' />}
                 value={filter.title}
                 onChange={(e) => this.onChangeUserName(e, 'title')}
@@ -194,6 +213,28 @@ export default class UForm extends Component {
               </Select>
             </Col>
           </Row>
+          <Row>
+            <Col span={24}>
+              <h1 style={{ marginTop: '10px' }}>选择播报地区：</h1>
+              <div>
+                {AREA_LIST().map((tag) => (
+                  <CheckableTag
+                    style={{
+                      cursor: 'pointer',
+                      fontSize: '14px',
+                      marginBottom: '8px',
+                    }}
+                    key={tag}
+                    checked={this.state.selectedTags.indexOf(tag) > -1}
+                    onChange={(checked) => this.handleChange(tag, checked)}
+                  >
+                    {tag}
+                  </CheckableTag>
+                ))}
+              </div>
+            </Col>
+          </Row>
+          <br />
           <Row gutter={16}>
             <Button
               type='primary'
@@ -202,7 +243,7 @@ export default class UForm extends Component {
               }}
               style={{ marginLeft: '8px' }}
             >
-              新建工作计划
+              添加城市播报
             </Button>
             <div className='btnOpera'>
               <Button

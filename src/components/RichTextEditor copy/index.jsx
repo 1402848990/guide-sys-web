@@ -8,9 +8,7 @@ import {
   Rate,
   message,
   Descriptions,
-  Tag,
 } from 'antd'
-import {AREA_LIST} from '@/utils'
 import axios from '../../request/axiosConfig'
 import { EditorState, convertToRaw, ContentBlock, ContentState } from 'draft-js'
 import { Editor } from 'react-draft-wysiwyg'
@@ -22,7 +20,6 @@ import './index.less'
 import moment from 'moment'
 
 const HOST = 'http://localhost:8088/interface'
-const { CheckableTag } = Tag
 
 const RichTextEditor = () => {
   // 标题
@@ -34,12 +31,11 @@ const RichTextEditor = () => {
   const [detail, setDetail] = useState(null)
   const [edit, setEdit] = useState(false)
   const [show, setShow] = useState(false)
-  const [selectedTags, setSelectedTags] = useState([])
 
   // 获取数据
   const getDetail = async (id) => {
     // const
-    const res = await axios.post(`${HOST}/User/detailCityNotice`, {
+    const res = await axios.post(`${HOST}/User/detailPlan`, {
       id,
     })
     return res.data
@@ -60,7 +56,6 @@ const RichTextEditor = () => {
           const contentState = ContentState.createFromBlockArray(
             contentBlock.contentBlocks
           )
-          setSelectedTags(record.areaName.split(','))
           setTitle(record.title)
           setLevel(record.level)
           setEditorState(EditorState.createWithContent(contentState))
@@ -75,7 +70,6 @@ const RichTextEditor = () => {
             const contentState = ContentState.createFromBlockArray(
               contentBlock.contentBlocks
             )
-            setSelectedTags(record.areaName.split(','))
             setTitle(record.title)
             setLevel(record.level)
             setEditorState(EditorState.createWithContent(contentState))
@@ -90,36 +84,24 @@ const RichTextEditor = () => {
     fun()
   }, [])
 
-  const handleChange = (tag, checked) => {
-    const nextSelectedTags = checked
-      ? [...selectedTags, tag]
-      : selectedTags.filter((t) => t !== tag)
-    console.log('You are interested in: ', nextSelectedTags)
-    setSelectedTags(nextSelectedTags)
-  }
-
   const onEditorStateChange = (editorState) => setEditorState(editorState)
 
-  // 提交
   const submit = async () => {
-    console.log('title',title,'level',level,'selectTags',selectedTags)
     const res = await axios({
       url: edit
-        ? 'http://localhost:8088/interface/User/updateCityNotice'
-        : 'http://localhost:8088/interface/User/addCityNotice',
+        ? 'http://localhost:8088/interface/User/updatePlan'
+        : 'http://localhost:8088/interface/User/addPlan',
       method: 'post',
       data: edit
         ? {
             id: detail.id,
             title,
             level,
-            areaName:selectedTags.join(','),
             content: draftToHtml(convertToRaw(editorState.getCurrentContent())),
           }
         : {
             title,
             level,
-            areaName:selectedTags.join(','),
             content: draftToHtml(convertToRaw(editorState.getCurrentContent())),
           },
     })
@@ -130,7 +112,7 @@ const RichTextEditor = () => {
 
   return (
     <div>
-      <Card bordered={false} title='地区疫情信息播报'>
+      <Card bordered={false} title='城市疫情信息播报'>
         {show ? (
           <Descriptions title='城市疫情播报基本信息'>
             <Descriptions.Item label='创建时间'>
@@ -141,21 +123,7 @@ const RichTextEditor = () => {
             </Descriptions.Item>
           </Descriptions>
         ) : null}
-        <h1 style={{ marginTop: '10px' }}>选择播报地区：</h1>
-        <div>
-          {AREA_LIST().map((tag) => (
-            <CheckableTag
-              style={{cursor:'pointer',fontSize:'14px',marginBottom:'8px'}}
-              key={tag}
-              checked={selectedTags.indexOf(tag) > -1}
-              onChange={(checked) => handleChange(tag, checked)}
-            >
-              {tag}
-            </CheckableTag>
-          ))}
-        </div>
-        <br />
-        <h1>疫情播报标题：</h1>
+        <h1>城市疫情播报标题：</h1>
         {show ? (
           title
         ) : (
@@ -169,7 +137,7 @@ const RichTextEditor = () => {
         {/* 富文本编辑器 */}
         {!show && (
           <>
-            <h1 style={{ marginTop: '10px' }}>疫情播报内容：</h1>
+            <h1 style={{ marginTop: '10px' }}>城市疫情播报内容：</h1>
             <Editor
               editorState={editorState}
               onEditorStateChange={onEditorStateChange}
@@ -182,7 +150,7 @@ const RichTextEditor = () => {
         )}
         {show && (
           <>
-            <h1 style={{ marginTop: '10px' }}>疫情播报内容：</h1>
+            <h1 style={{ marginTop: '10px' }}>城市疫情播报内容：</h1>
             <div
               dangerouslySetInnerHTML={{
                 __html: draftToHtml(
@@ -193,7 +161,7 @@ const RichTextEditor = () => {
           </>
         )}
         {/* 重要等级 */}
-        <h1 style={{ marginTop: '10px' }}>乐观等级：</h1>
+        <h1 style={{ marginTop: '10px' }}>重要等级：</h1>
         <Rate
           value={level}
           onChange={(val) => {

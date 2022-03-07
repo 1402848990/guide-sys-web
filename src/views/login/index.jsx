@@ -41,7 +41,7 @@ const Login = (props) => {
           })
           message.success({content:'登录成功！'})
           setTimeout(() => {
-            window.location.href = '/dashboard'
+            window.location.href = '/siteMessageManage'
           }, 1000);
           console.log('cookie',Cookie.get('userInfo'))
         } else {
@@ -63,7 +63,7 @@ const Login = (props) => {
     return <Redirect to='/dashboard' />
   }
   return (
-    <DocumentTitle title={'导员登录'}>
+    <DocumentTitle title={'疫情管理员登录'}>
       <div className='login-container'>
         <div className='content'>
           <Spin spinning={loading} tip='登录中...'>
@@ -72,7 +72,7 @@ const Login = (props) => {
               defaultActiveKey='1'
               onChange={(e) => setKey(e)}
             >
-              <TabPane tab='导员登录' key='1'>
+              <TabPane tab='疫情管理员登录' key='1'>
                 <Form onSubmit={handleSubmit}>
                   <Form.Item>
                     {getFieldDecorator('userName', {
@@ -131,7 +131,7 @@ const Login = (props) => {
                 </Form>
               </TabPane>
               {/* 注册模块 */}
-              <TabPane tab='导员注册' key='2'>
+              <TabPane tab='疫情管理员注册' key='2'>
                 <Form onSubmit={handleSubmit}>
                   <Form.Item>
                     {getFieldDecorator('userName', {
@@ -236,27 +236,6 @@ const Login = (props) => {
                         }
                         type='email'
                         placeholder='邮箱'
-                      />
-                    )}
-                  </Form.Item>
-                  <Form.Item>
-                    {getFieldDecorator('garde', {
-                      rules: [
-                        {
-                          required: key === '2',
-                          whitespace: true,
-                          message: '请输入年级',
-                        },
-                      ],
-                    })(
-                      <Input
-                        prefix={
-                          <Icon
-                            type='lock'
-                            style={{ color: 'rgba(0,0,0,.25)' }}
-                          />
-                        }
-                        placeholder='年级'
                       />
                     )}
                   </Form.Item>

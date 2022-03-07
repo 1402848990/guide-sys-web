@@ -160,7 +160,7 @@ class Contact extends React.Component {
               md: 4,
               lg: 4,
               xl: 6,
-              xxl: 3,
+              xxl: 6,
             }}
             className='demo-loadmore-list'
             // loading={initLoading}
@@ -172,6 +172,12 @@ class Contact extends React.Component {
             renderItem={(item) => (
               <List.Item>
                 <Card
+                cover={
+                  <img
+                    alt="example"
+                    src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png"
+                  />
+                }
                   className='noteCard'
                   hoverable
                   actions={[
